@@ -839,6 +839,263 @@
     }
 
 
+        /* -------------------------------------------------------------
+       3. SCREENSHOT 1 DASHBOARD ELEMENTS (HERO, STATS, LOOKUP, FEED)
+       ------------------------------------------------------------- */
+    /* Hero Banner: Light Mode */
+    .campus-hero-banner {
+      background: linear-gradient(135deg, #ffffff 0%, #faf6f0 100%) !important;
+      border: 1px solid var(--line-strong) !important;
+      border-radius: 22px !important;
+      padding: 32px 36px !important;
+      margin-bottom: 24px !important;
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      gap: 28px !important;
+      position: relative !important;
+      overflow: hidden !important;
+      box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.08) !important;
+      color: #1c1917 !important;
+      transition: var(--droplet-transition);
+    }
+    .campus-hero-banner::after {
+      content: '' !important;
+      position: absolute !important;
+      top: -120px !important;
+      right: -80px !important;
+      width: 320px !important;
+      height: 320px !important;
+      border-radius: 50% !important;
+      background: radial-gradient(circle, rgba(228, 87, 46, 0.14) 0%, transparent 70%) !important;
+      pointer-events: none !important;
+    }
+    .hero-content {
+      flex: 1;
+      min-width: 0;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(228, 87, 46, 0.12) !important;
+      border: 1px solid rgba(228, 87, 46, 0.32) !important;
+      color: #c13d14 !important;
+      font-size: 11.5px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: 0.03em;
+    }
+    .hero-badge .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 8px currentColor;
+      animation: pulseDot 2s infinite;
+    }
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 1.3rem + 1vw, 2.1rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      margin-bottom: 8px;
+      color: #1c1917 !important;
+    }
+    .hero-desc {
+      font-family: var(--font-body);
+      font-size: 14px;
+      line-height: 1.55;
+      color: #44403c !important;
+      max-width: 600px;
+    }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .campus-hero-banner .btn-ghost-dark {
+      background: #ffffff !important;
+      color: #1c1917 !important;
+      border: 1px solid var(--line-strong) !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    .campus-hero-banner .btn-ghost-dark:hover {
+      background: var(--surface-2) !important;
+      transform: translateY(-1px);
+    }
+    .hero-logo-showcase {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 22px;
+      border-radius: 18px;
+      background: #ffffff !important;
+      border: 1px solid var(--line-strong) !important;
+      box-shadow: 0 4px 16px rgba(28, 25, 23, 0.06);
+      transition: var(--droplet-transition);
+    }
+    .hero-logo-img {
+      max-height: 80px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.08));
+    }
+
+    /* Hero Banner: Dark Mode */
+    [data-theme="dark"] .campus-hero-banner {
+      background: linear-gradient(135deg, #111827 0%, #0f172a 100%) !important;
+      border-color: rgba(255, 255, 255, 0.1) !important;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5) !important;
+      color: #f8fafc !important;
+    }
+    [data-theme="dark"] .campus-hero-banner::after {
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, transparent 70%) !important;
+    }
+    [data-theme="dark"] .hero-badge {
+      background: rgba(56, 189, 248, 0.15) !important;
+      border-color: rgba(56, 189, 248, 0.35) !important;
+      color: #38bdf8 !important;
+    }
+    [data-theme="dark"] .hero-title {
+      color: #f8fafc !important;
+    }
+    [data-theme="dark"] .hero-desc {
+      color: #cbd5e1 !important;
+    }
+    [data-theme="dark"] .campus-hero-banner .btn-ghost-dark {
+      background: rgba(255, 255, 255, 0.14) !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.28) !important;
+      box-shadow: none;
+    }
+    [data-theme="dark"] .campus-hero-banner .btn-ghost-dark:hover {
+      background: rgba(255, 255, 255, 0.24) !important;
+    }
+    [data-theme="dark"] .hero-logo-showcase {
+      background: rgba(255, 255, 255, 0.06) !important;
+      border-color: rgba(255, 255, 255, 0.12) !important;
+      box-shadow: none;
+    }
+    [data-theme="dark"] .hero-logo-img {
+      filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.4));
+    }
+
+    /* 4-Card Stats Grid */
+    .campus-stats-grid {
+      display: grid !important;
+      grid-template-columns: repeat(4, 1fr) !important;
+      gap: 16px !important;
+      margin-bottom: 24px !important;
+    }
+    @media (max-width: 1024px) {
+      .campus-stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    }
+    @media (max-width: 640px) {
+      .campus-stats-grid { grid-template-columns: 1fr !important; }
+      .campus-hero-banner {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+      }
+      .hero-logo-showcase {
+        align-self: center !important;
+      }
+    }
+    .campus-stat-card {
+      padding: 22px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      border-radius: 20px !important;
+      background: var(--surface) !important;
+      border: 1px solid var(--line) !important;
+      box-shadow: var(--shadow) !important;
+    }
+    .campus-stat-card:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 12px 24px -4px rgba(34, 27, 38, 0.1) !important;
+    }
+    .stat-header {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      margin-bottom: 12px !important;
+    }
+    .stat-label {
+      font-size: 11.5px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.05em !important;
+      text-transform: uppercase !important;
+      color: var(--ink-3) !important;
+    }
+    .stat-icon-wrapper {
+      width: 34px !important;
+      height: 34px !important;
+      border-radius: 10px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      background: var(--surface-2) !important;
+      color: var(--ink) !important;
+    }
+    .stat-number {
+      font-family: var(--font-display) !important;
+      font-size: clamp(2rem, 1.8rem + 1vw, 2.6rem) !important;
+      font-weight: 700 !important;
+      line-height: 1 !important;
+      color: var(--ink) !important;
+      margin-bottom: 12px !important;
+    }
+    .stat-trend {
+      font-size: 12.5px !important;
+      color: var(--ink-3) !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+    }
+    .trend-indicator {
+      font-weight: 700 !important;
+      color: var(--good) !important;
+    }
+    .trend-warn {
+      color: #f59e0b !important;
+      font-weight: 500 !important;
+    }
+
+    /* Cards for Lookup & Incident Feed */
+    .campus-lookup-card, .campus-feed-card {
+      padding: 24px 28px !important;
+      margin-bottom: 24px !important;
+      border-radius: 20px !important;
+      background: var(--surface) !important;
+      border: 1px solid var(--line) !important;
+      box-shadow: var(--shadow) !important;
+    }
+    .bento-insights-grid {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      gap: 20px !important;
+      margin-top: 24px !important;
+    }
+    @media (max-width: 900px) {
+      .bento-insights-grid { grid-template-columns: 1fr !important; }
+    }
+
+    .views, #main {
+      grid-area: board !important;
+      min-width: 0 !important;
+      width: 100% !important;
+    }
+
     /* Light/Dark Hero Banner Customization */
     .campus-hero-banner {
       background: linear-gradient(135deg, #ffffff 0%, #faf6f0 100%) !important;

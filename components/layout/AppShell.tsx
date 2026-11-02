@@ -21,6 +21,21 @@ export function AppShell({ children }: AppShellProps) {
   const [totalCount, setTotalCount] = useState(0);
   const [criticalCount, setCriticalCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
+  const [hoveredTip, setHoveredTip] = useState<{ text: string; top: number } | null>(null);
+
+  const handleNavMouseEnter = (e: React.MouseEvent<HTMLElement>, label: string) => {
+    if (railOpen) return;
+    const panel = document.getElementById("rail-panel");
+    if (!panel) return;
+    const targetRect = e.currentTarget.getBoundingClientRect();
+    const panelRect = panel.getBoundingClientRect();
+    const y = targetRect.top - panelRect.top + (targetRect.height / 2) - 14;
+    setHoveredTip({ text: label, top: y });
+  };
+
+  const handleNavMouseLeave = () => {
+    setHoveredTip(null);
+  };
 
   const updateCounts = useCallback(() => {
     if (typeof window === "undefined") return;
@@ -158,6 +173,8 @@ export function AppShell({ children }: AppShellProps) {
                   <Link
                     href="/"
                     className={`rail__item ${pathname === "/" || pathname === "/dashboard" ? "is-active" : ""}`}
+                    onMouseEnter={(e) => handleNavMouseEnter(e, "Overview")}
+                    onMouseLeave={handleNavMouseLeave}
                     aria-current={pathname === "/" || pathname === "/dashboard" ? "page" : undefined}
                   >
                     <span className="rail__icon">
@@ -170,6 +187,8 @@ export function AppShell({ children }: AppShellProps) {
                   <Link
                     href="/chat"
                     className={`rail__item ${pathname.startsWith("/chat") ? "is-active" : ""}`}
+                    onMouseEnter={(e) => handleNavMouseEnter(e, "AI Assistant")}
+                    onMouseLeave={handleNavMouseLeave}
                   >
                     <span className="rail__icon">
                       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5V17A2.5 2.5 0 0 1 4 14.5z"></path></svg>
@@ -182,6 +201,8 @@ export function AppShell({ children }: AppShellProps) {
                   <Link
                     href="/report"
                     className={`rail__item ${pathname.startsWith("/report") ? "is-active" : ""}`}
+                    onMouseEnter={(e) => handleNavMouseEnter(e, "Report Issue")}
+                    onMouseLeave={handleNavMouseLeave}
                   >
                     <span className="rail__icon">
                       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
@@ -193,6 +214,8 @@ export function AppShell({ children }: AppShellProps) {
                   <Link
                     href="/track"
                     className={`rail__item ${pathname.startsWith("/track") ? "is-active" : ""}`}
+                    onMouseEnter={(e) => handleNavMouseEnter(e, "Track Status")}
+                    onMouseLeave={handleNavMouseLeave}
                   >
                     <span className="rail__icon">
                       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg>
@@ -204,6 +227,8 @@ export function AppShell({ children }: AppShellProps) {
                   <Link
                     href="/admin"
                     className={`rail__item ${pathname.startsWith("/admin") ? "is-active" : ""}`}
+                    onMouseEnter={(e) => handleNavMouseEnter(e, "Staff Triage Desk")}
+                    onMouseLeave={handleNavMouseLeave}
                   >
                     <span className="rail__icon">
                       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.5 3.5 10.6l6.6 2.8 2.8 6.6z"></path><path d="m10.1 13.4 4.2-4.2"></path></svg>
@@ -216,6 +241,8 @@ export function AppShell({ children }: AppShellProps) {
                   <Link
                     href="/about"
                     className={`rail__item ${pathname.startsWith("/about") ? "is-active" : ""}`}
+                    onMouseEnter={(e) => handleNavMouseEnter(e, "About & System")}
+                    onMouseLeave={handleNavMouseLeave}
                   >
                     <span className="rail__icon">
                       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 8h.01M11 12h1v4h1"></path></svg>
@@ -243,6 +270,25 @@ export function AppShell({ children }: AppShellProps) {
               <span className="rail__label">{railOpen ? "Collapse sidebar" : "Expand sidebar"}</span>
             </button>
           </div>
+          {hoveredTip && !railOpen && (
+            <span
+              className="rail__tip"
+              id="rail-tip"
+              aria-hidden="true"
+              style={{
+                opacity: 1,
+                transform: `translateY(${hoveredTip.top}px)`,
+                display: "block",
+                position: "absolute",
+                left: "calc(100% + 12px)",
+                zIndex: 100,
+                pointerEvents: "none",
+                transition: "transform 0.15s ease-out, opacity 0.15s ease-out",
+              }}
+            >
+              {hoveredTip.text}
+            </span>
+          )}
         </nav>
 
         {/* 3. Topbar Header */}

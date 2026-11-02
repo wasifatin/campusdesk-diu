@@ -10,7 +10,7 @@ export default function OverviewPage() {
   const router = useRouter();
   const [quickTrackId, setQuickTrackId] = useState("");
   const [reports, setReports] = useState<Report[]>([]);
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [theme, setTheme] = useState<"dark" | "light">("light");
 
   const loadData = useCallback(() => {
     if (typeof window === "undefined") return;
@@ -20,12 +20,19 @@ export default function OverviewPage() {
 
   useEffect(() => {
     loadData();
-    const savedTheme = (localStorage.getItem("campusdesk_theme") as "dark" | "light") || "dark";
+    const savedTheme =
+      (localStorage.getItem("campusdesk_theme") as "dark" | "light") ||
+      (typeof document !== "undefined" && (document.documentElement.getAttribute("data-theme") as "dark" | "light")) ||
+      "light";
     setTheme(savedTheme);
 
     const handleUpdate = () => loadData();
-    const handleThemeChange = () => {
-      const current = (localStorage.getItem("campusdesk_theme") as "dark" | "light") || "dark";
+    const handleThemeChange = (e: any) => {
+      const current =
+        e?.detail ||
+        (localStorage.getItem("campusdesk_theme") as "dark" | "light") ||
+        (typeof document !== "undefined" && (document.documentElement.getAttribute("data-theme") as "dark" | "light")) ||
+        "light";
       setTheme(current);
     };
 
@@ -212,21 +219,28 @@ export default function OverviewPage() {
           HERO BANNER (MATCHES INDEX.HTML CAMPUSDESK DESIGN)
           ------------------------------------------------------------- */}
       <div className="campus-hero-banner">
-        <div>
-          <div className="badge badge-medium" style={{ marginBottom: "10px" }}>
-            Metropolitan Central University Dispatch
+        <div className="hero-content">
+          <div className="hero-badge">
+            <span className="live-dot" />
+            <span>Metropolitan Central University Dispatch</span>
           </div>
           <h1 className="hero-title">Intelligent Campus Operations & Triage</h1>
           <p className="hero-desc">
             Real-time incident stream, automated severity triage with instant keyword
             escalation, and student resolution monitoring.
           </p>
-          <div style={{ display: "flex", gap: "10px", marginTop: "18px" }}>
+          <div className="hero-actions">
             <Link href="/report" className="btn-action btn-primary-glow">
-              + Report Incident
+              <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              <span>Report Incident</span>
             </Link>
             <Link href="/chat" className="btn-action btn-ghost-dark">
-              Ask AI Assistant
+              <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+              <span>Ask AI Assistant</span>
             </Link>
           </div>
         </div>
