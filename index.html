@@ -1,0 +1,3705 @@
+<!DOCTYPE html>
+<html lang="en" class="js" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>CampusDesk · Intelligent Campus Operations</title>
+  <meta name="description" content="Intelligent campus operations help desk: real-time incident triage, AI dispatch, audience analytics, delivery rates, and student resolution monitoring.">
+  <meta name="theme-color" content="#efe9e1">
+  <link rel="icon" type="image/png" href="logo-dark.png">
+
+  <!-- Google Fonts: Bricolage Grotesque & Geist -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..700&family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+  <!-- CampusDesk Design System CSS -->
+  <link rel="stylesheet" href="campus-design.css">
+
+  <!-- GSAP 3.12.5 -->
+  <script src="gsap.min.js"></script>
+  <script>
+    if (typeof gsap === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"><\/script>');
+    }
+  </script>
+
+  <style>
+    /* -------------------------------------------------------------
+       1. CINEMATIC STARTUP SPLASH (CLEAN LOGO ANIMATION, NO CLUTTER)
+       ------------------------------------------------------------- */
+    #startupSplash {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: radial-gradient(circle at center, #1e1724 0%, #100b14 60%, #070508 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      cursor: pointer;
+      transition: opacity 0.75s cubic-bezier(0.25, 1, 0.5, 1), transform 0.75s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    #startupSplash:before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url('grain.png') repeat;
+      opacity: 0.08;
+      pointer-events: none;
+    }
+    #startupSplash.vanish {
+      opacity: 0;
+      transform: scale(1.05);
+      pointer-events: none;
+    }
+    .ambient-glow-circle {
+      position: absolute;
+      width: 580px;
+      height: 580px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(228, 87, 46, 0.45) 0%, rgba(30, 154, 138, 0.22) 48%, transparent 70%);
+      animation: pulseAura 3s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+    @keyframes pulseAura {
+      0% { transform: scale(0.9); opacity: 0.55; }
+      100% { transform: scale(1.22); opacity: 0.95; }
+    }
+    .splash-logo-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: logoFloatIn 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      z-index: 2;
+    }
+    @keyframes logoFloatIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(24px);
+        filter: drop-shadow(0 0 0px rgba(228, 87, 46, 0));
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: drop-shadow(0 20px 40px rgba(228, 87, 46, 0.35));
+      }
+    }
+    .splash-logo-img {
+      max-width: 440px;
+      width: 82vw;
+      height: auto;
+      display: block;
+      object-fit: contain;
+      animation: logoGleam 2.8s ease-in-out infinite alternate;
+    }
+    @keyframes logoGleam {
+      0% { transform: translateY(0); filter: drop-shadow(0 12px 25px rgba(228, 87, 46, 0.35)); }
+      100% { transform: translateY(-6px); filter: drop-shadow(0 22px 50px rgba(228, 87, 46, 0.55)); }
+    }
+
+    /* -------------------------------------------------------------
+       2. WATER-DROPLET SMOOTH THEME ENGINE & CUSTOM TOKENS
+       ------------------------------------------------------------- */
+    :root, [data-theme="light"] {
+      --droplet-transition: background 0.45s cubic-bezier(0.25, 1, 0.5, 1),
+                            background-color 0.45s cubic-bezier(0.25, 1, 0.5, 1),
+                            color 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+                            border-color 0.45s cubic-bezier(0.25, 1, 0.5, 1),
+                            box-shadow 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+      --bg: #efe9e1;
+      --bg-2: #e7dfd4;
+      --surface: #fffdf9;
+      --surface-2: #f7f2eb;
+      --line: #ebe3d8;
+      --line-strong: #e0d6ca;
+      --ink: #221b26;
+      --ink-2: #554b5a;
+      --ink-3: #6b6071;
+      --rail: #221b26;
+      --cream: #fff6ee;
+      --card-bg: #fffdf9;
+      --card-border: #ebe3d8;
+      --c-tangerine: #e4572e;
+      --c-teal: #1e9a8a;
+      --c-violet: #5b3e8c;
+      --c-tangerine-soft: #f6d6c8;
+      --c-tangerine-deep: #c13d14;
+      --c-violet-soft: #e2d9ef;
+      --good: #176a47;
+      --good-bg: #e2f2e8;
+      --bad: #b3261e;
+      --bad-bg: #f8e1df;
+      --shadow: 0 4px 20px -2px rgba(34, 27, 38, 0.06);
+    }
+
+    [data-theme="dark"] {
+      --bg: #090d16;
+      --bg-2: #0f1624;
+      --surface: #131c2e;
+      --surface-2: #192338;
+      --line: rgba(255, 255, 255, 0.08);
+      --line-strong: rgba(255, 255, 255, 0.14);
+      --ink: #f8fafc;
+      --ink-2: #94a3b8;
+      --ink-3: #64748b;
+      --rail: #070a10;
+      --cream: #f8fafc;
+      --card-bg: #131c2e;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --c-tangerine: #38bdf8;
+      --c-teal: #10b981;
+      --c-violet: #a855f7;
+      --c-tangerine-soft: rgba(56, 189, 248, 0.15);
+      --c-tangerine-deep: #0284c7;
+      --c-violet-soft: rgba(168, 85, 247, 0.15);
+      --good: #34d399;
+      --good-bg: rgba(16, 185, 129, 0.15);
+      --bad: #f87171;
+      --bad-bg: rgba(239, 68, 68, 0.15);
+      --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    *, *::before, *::after {
+      transition: var(--droplet-transition);
+    }
+
+    /* -------------------------------------------------------------
+       3. SCREENSHOT 1 DASHBOARD ELEMENTS (HERO, STATS, LOOKUP, FEED)
+       ------------------------------------------------------------- */
+    /* Hero Banner: Light Mode */
+    .campus-hero-banner {
+      background: linear-gradient(135deg, #ffffff 0%, #faf6f0 100%) !important;
+      border: 1px solid var(--line-strong) !important;
+      border-radius: 22px;
+      padding: 32px 36px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 28px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.08) !important;
+      color: #1c1917 !important;
+      transition: var(--droplet-transition);
+    }
+    .campus-hero-banner::after {
+      content: '';
+      position: absolute;
+      top: -120px;
+      right: -80px;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(228, 87, 46, 0.14) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(228, 87, 46, 0.12) !important;
+      border: 1px solid rgba(228, 87, 46, 0.32) !important;
+      color: #c13d14 !important;
+      font-size: 11.5px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: 0.03em;
+    }
+    .hero-badge .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 8px currentColor;
+      animation: pulseDot 2s infinite;
+    }
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 1.3rem + 1vw, 2.1rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      margin-bottom: 8px;
+      color: #1c1917 !important;
+    }
+    .hero-desc {
+      font-family: var(--font-body);
+      font-size: 14px;
+      line-height: 1.55;
+      color: #44403c !important;
+      max-width: 600px;
+    }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .campus-hero-banner .btn-ghost-dark {
+      background: #ffffff !important;
+      color: #1c1917 !important;
+      border: 1px solid var(--line-strong) !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    .campus-hero-banner .btn-ghost-dark:hover {
+      background: var(--surface-2) !important;
+      transform: translateY(-1px);
+    }
+    .hero-logo-showcase {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 22px;
+      border-radius: 18px;
+      background: #ffffff !important;
+      border: 1px solid var(--line-strong) !important;
+      box-shadow: 0 4px 16px rgba(28, 25, 23, 0.06);
+      transition: var(--droplet-transition);
+    }
+    .hero-logo-img {
+      max-height: 80px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.08));
+    }
+
+    /* Hero Banner: Dark Mode */
+    [data-theme="dark"] .campus-hero-banner {
+      background: linear-gradient(135deg, #111827 0%, #0f172a 100%) !important;
+      border-color: rgba(255, 255, 255, 0.1) !important;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5) !important;
+      color: #f8fafc !important;
+    }
+    [data-theme="dark"] .campus-hero-banner::after {
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, transparent 70%) !important;
+    }
+    [data-theme="dark"] .hero-badge {
+      background: rgba(56, 189, 248, 0.15) !important;
+      border-color: rgba(56, 189, 248, 0.35) !important;
+      color: #38bdf8 !important;
+    }
+    [data-theme="dark"] .hero-title {
+      color: #f8fafc !important;
+    }
+    [data-theme="dark"] .hero-desc {
+      color: #cbd5e1 !important;
+    }
+    [data-theme="dark"] .campus-hero-banner .btn-ghost-dark {
+      background: rgba(255, 255, 255, 0.14) !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.28) !important;
+      box-shadow: none;
+    }
+    [data-theme="dark"] .campus-hero-banner .btn-ghost-dark:hover {
+      background: rgba(255, 255, 255, 0.24) !important;
+    }
+    [data-theme="dark"] .hero-logo-showcase {
+      background: rgba(255, 255, 255, 0.06) !important;
+      border-color: rgba(255, 255, 255, 0.12) !important;
+      box-shadow: none;
+    }
+    [data-theme="dark"] .hero-logo-img {
+      filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.4));
+    }
+
+    /* 4-Card Stats Grid */
+    .campus-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 1024px) {
+      .campus-stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .campus-stats-grid { grid-template-columns: 1fr; }
+    }
+    .campus-stat-card {
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-radius: 20px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+    .campus-stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px -4px rgba(34, 27, 38, 0.1);
+    }
+    .stat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .stat-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+    }
+    .stat-icon-wrapper {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface-2);
+      color: var(--ink);
+    }
+    .stat-number {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 1.8rem + 1vw, 2.6rem);
+      font-weight: 700;
+      line-height: 1;
+      color: var(--ink);
+      margin-bottom: 12px;
+    }
+    .stat-trend {
+      font-size: 12.5px;
+      color: var(--ink-3);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .trend-warn {
+      color: #f59e0b;
+      font-weight: 500;
+    }
+
+    /* Cards for Lookup & Incident Feed */
+    .campus-lookup-card, .campus-feed-card {
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      border-radius: 20px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+    .bento-insights-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 24px;
+    }
+    @media (max-width: 900px) {
+      .bento-insights-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Floating Rail Emergency Pill */
+    .rail__emergency {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #f87171;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: auto;
+      margin-bottom: 12px;
+      transition: all 0.2s;
+    }
+    .rail__emergency:hover {
+      background: rgba(239, 68, 68, 0.25);
+      transform: scale(1.02);
+    }
+    .rail:not(.is-open) .rail__emergency-text {
+      display: none;
+    }
+
+    /* Water-Droplet Theme Button */
+    .theme-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      color: var(--ink-2);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .theme-toggle-btn:hover {
+      background: var(--line);
+      color: var(--ink);
+      transform: scale(1.05);
+    }
+
+    /* Modal Backdrop */
+    .campus-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(34, 27, 38, 0.45);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .campus-modal-backdrop.open {
+      display: flex;
+    }
+    .campus-modal-window {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 28px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 24px 60px -15px rgba(34, 27, 38, 0.4);
+    }
+  
+
+    /* =============================================================
+       HIGH-CONTRAST VISIBILITY & THEME SYSTEM (DARK & LIGHT MODES)
+       ============================================================= */
+
+    /* Universal color inheritance on interactive elements */
+    button, input, select, textarea {
+      font-family: inherit;
+      color: inherit;
+    }
+
+    /* ── 1. LIGHT MODE PALETTE (HIGH CONTRAST & CRISP) ───────── */
+    :root, [data-theme="light"] {
+      --bg: #efe9e1;
+      --bg-2: #e7dfd4;
+      --surface: #ffffff;
+      --surface-2: #f5f0e8;
+      --line: #ded5c7;
+      --line-strong: #c8bdad;
+      --ink: #1c1917;
+      --ink-2: #44403c;
+      --ink-3: #78716c;
+      --rail: #1c1917;
+      --cream: #ffffff;
+      --c-tangerine: #e4572e;
+      --c-tangerine-soft: #fde8e1;
+      --c-tangerine-deep: #c13d14;
+      --c-teal: #0d9488;
+      --c-teal-soft: #ccfbf1;
+      --c-violet: #5b3e8c;
+      --c-violet-soft: #ede9fe;
+      --good: #15803d;
+      --good-bg: #dcfce7;
+      --bad: #b91c1c;
+      --bad-bg: #fee2e2;
+      --shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.08);
+      --card-bg: #ffffff;
+      --card-border: #ded5c7;
+    }
+
+    /* ── 2. DARK MODE PALETTE (OBSIDIAN MIDNIGHT, HIGH CONTRAST) ─ */
+    [data-theme="dark"] {
+      --bg: #090d16;
+      --bg-2: #0f1624;
+      --surface: #131c2e;
+      --surface-2: #1a253c;
+      --line: rgba(255, 255, 255, 0.1);
+      --line-strong: rgba(255, 255, 255, 0.18);
+      --ink: #f8fafc;
+      --ink-2: #cbd5e1;
+      --ink-3: #94a3b8;
+      --rail: #070a10;
+      --cream: #f8fafc;
+      --c-tangerine: #38bdf8;
+      --c-tangerine-soft: rgba(56, 189, 248, 0.16);
+      --c-tangerine-deep: #0284c7;
+      --c-teal: #34d399;
+      --c-teal-soft: rgba(52, 211, 153, 0.16);
+      --c-violet: #a855f7;
+      --c-violet-soft: rgba(168, 85, 247, 0.16);
+      --good: #34d399;
+      --good-bg: rgba(52, 211, 153, 0.16);
+      --bad: #f87171;
+      --bad-bg: rgba(248, 113, 113, 0.16);
+      --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      --card-bg: #131c2e;
+      --card-border: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Fix body background wash in dark mode */
+    [data-theme="dark"] body {
+      background: radial-gradient(1100px 600px at 85% -10%, rgba(56, 189, 248, 0.08) 0, transparent 60%),
+                  radial-gradient(900px 700px at -10% 110%, rgba(168, 85, 247, 0.08) 0, transparent 60%),
+                  #090d16 !important;
+      color: #f8fafc !important;
+    }
+
+    /* ── 3. BUTTONS (CRISP, VISIBLE IN BOTH MODES) ────────────── */
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      font-size: 13.5px;
+      font-weight: 600;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      transition: var(--droplet-transition);
+    }
+    .btn-action svg {
+      stroke: currentColor;
+      flex-shrink: 0;
+    }
+    .btn-primary-glow {
+      background: #e4572e !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 14px rgba(228, 87, 46, 0.35);
+    }
+    .btn-primary-glow:hover {
+      background: #c13d14 !important;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(228, 87, 46, 0.45);
+    }
+    [data-theme="dark"] .btn-primary-glow {
+      background: #0284c7 !important;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.45);
+    }
+    [data-theme="dark"] .btn-primary-glow:hover {
+      background: #0369a1 !important;
+      box-shadow: 0 6px 20px rgba(2, 132, 199, 0.6);
+    }
+
+    .btn-ghost-dark {
+      background: rgba(255, 255, 255, 0.14) !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.28) !important;
+      backdrop-filter: blur(8px);
+    }
+    .btn-ghost-dark:hover {
+      background: rgba(255, 255, 255, 0.25) !important;
+      border-color: rgba(255, 255, 255, 0.5) !important;
+    }
+
+    .quick-pill-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: var(--surface) !important;
+      border: 1px solid var(--line-strong) !important;
+      color: var(--ink) !important;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--droplet-transition);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    .quick-pill-btn svg {
+      stroke: currentColor;
+      flex-shrink: 0;
+    }
+    .quick-pill-btn:hover {
+      background: var(--surface-2) !important;
+      border-color: var(--ink-3) !important;
+      transform: translateY(-1px);
+    }
+    [data-theme="dark"] .quick-pill-btn {
+      background: #1a253c !important;
+      border-color: rgba(255, 255, 255, 0.16) !important;
+      color: #f8fafc !important;
+    }
+    [data-theme="dark"] .quick-pill-btn:hover {
+      background: #24324f !important;
+      border-color: rgba(255, 255, 255, 0.35) !important;
+      color: #ffffff !important;
+    }
+
+    /* ── 4. PERSONA PILL & SWITCHER ────────────────────────────── */
+    .persona-pill {
+      display: inline-flex;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 3px;
+      gap: 2px;
+      box-shadow: var(--shadow);
+    }
+    .persona-btn {
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: none;
+      font-size: 12px;
+      font-weight: 600;
+      background: transparent;
+      color: var(--ink-2);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .persona-btn:hover {
+      color: var(--ink);
+    }
+    .persona-btn.active {
+      background: #1c1917 !important;
+      color: #ffffff !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+    .persona-btn.active.admin {
+      background: #5b3e8c !important;
+      color: #ffffff !important;
+    }
+    [data-theme="dark"] .persona-pill {
+      background: #131c2e;
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+    [data-theme="dark"] .persona-btn {
+      color: #94a3b8;
+    }
+    [data-theme="dark"] .persona-btn.active {
+      background: #0284c7 !important;
+      color: #ffffff !important;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+    }
+    [data-theme="dark"] .persona-btn.active.admin {
+      background: #a855f7 !important;
+      color: #ffffff !important;
+    }
+
+    /* ── 5. FORM CONTROLS & INPUTS ────────────────────────────── */
+    .form-control, input.form-control, textarea.form-control, select.form-control,
+    .input, .select, .textarea {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--surface) !important;
+      border: 1px solid var(--line-strong) !important;
+      border-radius: 12px;
+      color: var(--ink) !important;
+      font-family: inherit;
+      font-size: 13.5px;
+      outline: none;
+      transition: var(--droplet-transition);
+      box-sizing: border-box;
+    }
+    .form-control::placeholder, .input::placeholder, .textarea::placeholder {
+      color: var(--ink-3) !important;
+      opacity: 0.85;
+    }
+    .form-control:focus, .input:focus, .select:focus, .textarea:focus {
+      border-color: var(--c-tangerine) !important;
+      box-shadow: 0 0 0 3px rgba(228, 87, 46, 0.15) !important;
+    }
+    [data-theme="dark"] .form-control:focus,
+    [data-theme="dark"] .input:focus,
+    [data-theme="dark"] .select:focus,
+    [data-theme="dark"] .textarea:focus {
+      border-color: #38bdf8 !important;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22) !important;
+    }
+
+    /* Search input text color fix */
+    .search input {
+      color: var(--ink) !important;
+    }
+    .search svg {
+      stroke: var(--ink-2) !important;
+    }
+    .sync {
+      color: var(--ink) !important;
+    }
+    .sync svg {
+      stroke: var(--ink-2) !important;
+    }
+    [data-theme="dark"] .sync svg {
+      stroke: #38bdf8 !important;
+    }
+
+    /* ── 6. RAIL ICONS (ACTIVE CONTRAST FIX) ──────────────────── */
+    .rail__panel {
+      background: var(--rail) !important;
+    }
+    .rail__item {
+      color: rgba(255, 255, 255, 0.72) !important;
+    }
+    .rail__item:hover {
+      color: #ffffff !important;
+    }
+    .rail__icon svg {
+      stroke: currentColor !important;
+      fill: none !important;
+    }
+    .rail__pill {
+      background: #ffffff !important;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+    }
+    [data-theme="dark"] .rail__pill {
+      background: #0284c7 !important;
+      box-shadow: 0 4px 16px rgba(2, 132, 199, 0.5) !important;
+    }
+    /* When active, the icon inside the pill must be high-contrast */
+    .rail__item.is-active .rail__icon {
+      color: #1c1917 !important;
+    }
+    [data-theme="dark"] .rail__item.is-active .rail__icon {
+      color: #ffffff !important;
+    }
+
+    /* ── 7. THEME TOGGLE BUTTON ICONS ─────────────────────────── */
+    .theme-toggle-btn {
+      background: var(--surface) !important;
+      border: 1px solid var(--line) !important;
+      color: var(--ink) !important;
+      cursor: pointer;
+    }
+    #themeIconSun {
+      stroke: #f59e0b !important;
+      color: #f59e0b !important;
+      filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.6));
+    }
+    #themeIconMoon {
+      stroke: #0284c7 !important;
+      color: #0284c7 !important;
+    }
+
+    /* ── 8. BADGES (ALL HIGH-CONTRAST & VIBRANT) ─────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      line-height: 1;
+    }
+    .badge-critical { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+    .badge-high { background: #ffedd5; color: #c2410c; border: 1px solid #fdba74; }
+    .badge-medium { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
+    .badge-low { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+    .badge-status-submitted { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+    .badge-status-under-review { background: #ffedd5; color: #9a3412; border: 1px solid #fed7aa; }
+    .badge-status-in-progress { background: #ede9fe; color: #6b21a8; border: 1px solid #ddd6fe; }
+    .badge-status-resolved { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+
+    [data-theme="dark"] .badge-critical { background: rgba(239, 68, 68, 0.22); color: #fca5a5; border-color: rgba(239, 68, 68, 0.45); }
+    [data-theme="dark"] .badge-high { background: rgba(249, 115, 22, 0.22); color: #fdba74; border-color: rgba(249, 115, 22, 0.45); }
+    [data-theme="dark"] .badge-medium { background: rgba(56, 189, 248, 0.22); color: #7dd3fc; border-color: rgba(56, 189, 248, 0.45); }
+    [data-theme="dark"] .badge-low { background: rgba(148, 163, 184, 0.22); color: #cbd5e1; border-color: rgba(148, 163, 184, 0.35); }
+    [data-theme="dark"] .badge-status-submitted { background: rgba(245, 158, 11, 0.22); color: #fde68a; border-color: rgba(245, 158, 11, 0.45); }
+    [data-theme="dark"] .badge-status-under-review { background: rgba(249, 115, 22, 0.22); color: #fed7aa; border-color: rgba(249, 115, 22, 0.45); }
+    [data-theme="dark"] .badge-status-in-progress { background: rgba(168, 85, 247, 0.22); color: #d8b4fe; border-color: rgba(168, 85, 247, 0.45); }
+    [data-theme="dark"] .badge-status-resolved { background: rgba(16, 185, 129, 0.22); color: #86efac; border-color: rgba(16, 185, 129, 0.45); }
+
+    /* ── 9. TABLES & HEADERS (CLEAR & HIGH CONTRAST) ──────────── */
+    .table th {
+      color: var(--ink-3) !important;
+      font-weight: 700 !important;
+      font-size: 11.5px !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.05em !important;
+      border-bottom: 2px solid var(--line) !important;
+      padding: 10px 12px !important;
+    }
+    .table td {
+      color: var(--ink) !important;
+      border-bottom: 1px solid var(--line) !important;
+      padding: 13px 12px !important;
+    }
+    .table tbody tr:hover {
+      background: var(--surface-2) !important;
+    }
+
+    /* ── 10. HEADINGS & TITLES (CLEAR & HIGH CONTRAST) ────────── */
+    .top__title, .card__title, .hero-title, h1, h2, h3, h4 {
+      color: var(--ink);
+    }
+    .top__sub, .hero-desc, .stat-trend, p {
+      color: var(--ink-2);
+    }
+    .card {
+      background: var(--surface) !important;
+      border: 1px solid var(--line) !important;
+    }
+    [data-theme="dark"] .card {
+      background: #131c2e !important;
+      border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    /* ── 11. CHAT & OTHER VIEWS STYLING ───────────────────────── */
+    .campus-chat-box {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 220px);
+      min-height: 520px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .chat-scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .chat-msg-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      max-width: 82%;
+    }
+    .chat-msg-row.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+    .chat-user-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11.5px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .chat-msg-row.bot .chat-user-avatar {
+      background: var(--c-tangerine);
+      color: #ffffff;
+    }
+    .chat-msg-row.user .chat-user-avatar {
+      background: var(--ink);
+      color: #ffffff;
+    }
+    .chat-speech-bubble {
+      padding: 13px 18px;
+      border-radius: 16px;
+      font-size: 13.5px;
+      line-height: 1.55;
+    }
+    .chat-msg-row.bot .chat-speech-bubble {
+      background: var(--surface-2);
+      color: var(--ink);
+      border-bottom-left-radius: 4px;
+      border: 1px solid var(--line);
+    }
+    .chat-msg-row.user .chat-speech-bubble {
+      background: #1c1917;
+      color: #ffffff;
+      border-bottom-right-radius: 4px;
+    }
+    [data-theme="dark"] .chat-msg-row.user .chat-speech-bubble {
+      background: #0284c7;
+      color: #ffffff;
+    }
+    .chat-suggestion-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .chip-item {
+      background: var(--surface);
+      border: 1px solid var(--line-strong);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-2);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .chip-item:hover {
+      border-color: var(--c-tangerine);
+      color: var(--c-tangerine);
+      background: var(--c-tangerine-soft);
+    }
+    /* ── 12. STRUCTURAL UTILITIES & HELPER CLASSES ─────────────── */
+    .chat-composer-bar {
+      padding: 16px 20px;
+      background: var(--surface);
+      border-top: 1px solid var(--line);
+      display: flex;
+      gap: 12px;
+    }
+    .campus-logo-img {
+      object-fit: contain;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .hero-content {
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .card-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+    .view-pane {
+      display: block;
+    }
+    .view-pane:not(.active) {
+      display: none !important;
+    }
+    .form-row {
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--ink-2);
+      display: block;
+    }
+
+  
+
+    /* =============================================================
+       13. MENU BARS & BUTTON VISIBILITY GUARANTEE
+       ============================================================= */
+    html.js .rail__item,
+    html.js .rail__logo,
+    html.js .top__hello > *,
+    html.js .top__tools > *,
+    .rail__item,
+    .rail__logo,
+    .top__hello > *,
+    .top__tools > *,
+    .top__title,
+    .top__sub,
+    .top__tools,
+    .top__hello {
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+
+    .rail__logo {
+      display: flex !important;
+      align-items: center !important;
+      gap: 16px !important;
+      height: 40px !important;
+      padding-left: 6px !important;
+      text-decoration: none !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    .rail__mark {
+      width: 34px !important;
+      height: 34px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      flex-shrink: 0 !important;
+    }
+    .rail__mark img {
+      width: 28px !important;
+      height: 28px !important;
+      object-fit: contain !important;
+      display: block !important;
+    }
+
+    .rail__ul {
+      position: relative !important;
+      z-index: 2 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 8px !important;
+    }
+    .rail__pill {
+      z-index: 1 !important;
+      pointer-events: none !important;
+    }
+
+    .rail__item {
+      display: flex !important;
+      align-items: center !important;
+      gap: 14px !important;
+      width: 100% !important;
+      height: 46px !important;
+      padding: 0 !important;
+      border: 0 !important;
+      border-radius: 14px !important;
+      background: transparent !important;
+      cursor: pointer !important;
+      position: relative !important;
+      z-index: 2 !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      text-decoration: none !important;
+      color: rgba(255, 255, 255, 0.75) !important;
+      transition: color 0.2s, transform 0.15s !important;
+    }
+    .rail__item:hover {
+      color: #ffffff !important;
+    }
+    .rail__icon {
+      width: 46px !important;
+      height: 46px !important;
+      border-radius: 14px !important;
+      display: grid !important;
+      place-items: center !important;
+      flex-shrink: 0 !important;
+      position: relative !important;
+      background: rgba(255, 255, 255, 0.08) !important;
+      transition: background-color 0.2s, color 0.2s !important;
+    }
+    .rail__item:hover .rail__icon {
+      background: rgba(255, 255, 255, 0.18) !important;
+    }
+    .rail__icon svg {
+      width: 22px !important;
+      height: 22px !important;
+      stroke-width: 1.8px !important;
+      stroke: currentColor !important;
+      fill: none !important;
+      display: block !important;
+    }
+
+    /* Active state in Rail - Light vs Dark */
+    .rail__item.is-active .rail__icon {
+      background: transparent !important;
+      color: #1c1917 !important;
+    }
+    [data-theme="dark"] .rail__item.is-active .rail__icon {
+      background: transparent !important;
+      color: #ffffff !important;
+    }
+
+    /* Rail Toggle & Emergency */
+    .rail__toggle {
+      margin-top: 4px !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    .rail__toggle .rail__icon {
+      background: transparent !important;
+    }
+    .rail__toggle:hover .rail__icon {
+      background: rgba(255, 255, 255, 0.12) !important;
+    }
+    .rail__emergency {
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+
+    /* Topbar Sections and Controls */
+    .top {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      flex-wrap: wrap !important;
+      gap: 16px !important;
+      padding-top: 6px !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    .top__hello {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 4px !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    .top__title {
+      font-size: 1.5rem !important;
+      font-weight: 700 !important;
+      color: var(--ink) !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      display: block !important;
+    }
+    .top__title .w {
+      color: var(--ink-3) !important;
+      font-weight: 500 !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    .top__title strong {
+      color: var(--ink) !important;
+      font-weight: 700 !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    .top__sub {
+      font-size: 0.875rem !important;
+      color: var(--ink-2) !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      display: block !important;
+    }
+    .top__tools {
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    .top__tools > * {
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+
+    /* Search Input Control */
+    .search {
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      height: 44px !important;
+      padding: 0 10px 0 14px !important;
+      border-radius: 12px !important;
+      background: var(--surface) !important;
+      border: 1px solid var(--line-strong) !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    }
+    .search input {
+      background: transparent !important;
+      border: none !important;
+      outline: none !important;
+      color: var(--ink) !important;
+      font-size: 13.5px !important;
+      width: 160px !important;
+    }
+    .search svg {
+      width: 18px !important;
+      height: 18px !important;
+      stroke: var(--ink-2) !important;
+      fill: none !important;
+    }
+    .search kbd {
+      padding: 3px 6px !important;
+      font-size: 11px !important;
+      background: var(--surface-2) !important;
+      color: var(--ink-3) !important;
+      border: 1px solid var(--line) !important;
+      border-radius: 6px !important;
+    }
+
+    /* Sync Button */
+    .sync {
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      height: 44px !important;
+      padding: 0 14px 0 12px !important;
+      border-radius: 12px !important;
+      background: var(--surface) !important;
+      border: 1px solid var(--line-strong) !important;
+      color: var(--ink) !important;
+      cursor: pointer !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    }
+    .sync svg {
+      width: 18px !important;
+      height: 18px !important;
+      stroke: var(--c-tangerine) !important;
+      fill: none !important;
+      flex-shrink: 0 !important;
+    }
+    [data-theme="dark"] .sync svg {
+      stroke: #38bdf8 !important;
+    }
+
+    /* Theme Toggle Button */
+    .theme-toggle-btn {
+      width: 44px !important;
+      height: 44px !important;
+      border-radius: 12px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      background: var(--surface) !important;
+      border: 1px solid var(--line-strong) !important;
+      color: var(--ink) !important;
+      cursor: pointer !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+      transition: var(--droplet-transition) !important;
+    }
+    .theme-toggle-btn:hover {
+      background: var(--surface-2) !important;
+      transform: translateY(-1px) !important;
+    }
+
+    /* Avatar Button */
+    .avatar {
+      width: 44px !important;
+      height: 44px !important;
+      border-radius: 12px !important;
+      background: linear-gradient(135deg, #e4572e, #c13d14) !important;
+      color: #ffffff !important;
+      font-weight: 700 !important;
+      font-size: 13px !important;
+      border: none !important;
+      cursor: pointer !important;
+      box-shadow: 0 2px 8px rgba(228, 87, 46, 0.3) !important;
+      display: grid !important;
+      place-items: center !important;
+      transition: var(--droplet-transition) !important;
+    }
+    .avatar:hover {
+      transform: translateY(-1px) !important;
+    }
+    [data-theme="dark"] .avatar {
+      background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4) !important;
+    }
+
+    /* Segment Buttons in Bento Cards */
+    .seg button.is-active,
+    .seg button[aria-pressed="true"] {
+      background: var(--surface) !important;
+      color: var(--ink) !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+      font-weight: 700 !important;
+    }
+    [data-theme="dark"] .seg button.is-active,
+    [data-theme="dark"] .seg button[aria-pressed="true"] {
+      background: #1e293b !important;
+      color: #ffffff !important;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+      font-weight: 700 !important;
+    }
+
+  
+
+    /* =============================================================
+       14. HIGH-VISIBILITY BORDERS FOR LIGHT & DARK MODES
+       ============================================================= */
+    :root, [data-theme="light"] {
+      --line: #d1c4b2 !important;
+      --line-strong: #baa994 !important;
+      --card-border: #d1c4b2 !important;
+    }
+
+    /* All Cards, Stat Cards & Bento Containers in Light Mode */
+    .card,
+    .campus-stat-card,
+    .campus-card,
+    .campus-hero-banner,
+    .campus-lookup-card,
+    .campus-feed-card,
+    .card--month,
+    #mix,
+    #top-contacts,
+    .bento-insights-grid .card,
+    .hero-logo-showcase {
+      border: 1.5px solid #d1c4b2 !important;
+      box-shadow: 0 2px 10px -2px rgba(28, 25, 23, 0.08), 0 1px 3px rgba(28, 25, 23, 0.04) !important;
+    }
+
+    /* Interactive controls & buttons in Light Mode */
+    .search,
+    .sync,
+    .quick-pill-btn,
+    .persona-pill,
+    .theme-toggle-btn,
+    .seg,
+    .form-control,
+    input.form-control,
+    select.form-control,
+    textarea.form-control {
+      border: 1.5px solid #cfc2af !important;
+    }
+
+    .card:hover,
+    .campus-stat-card:hover {
+      border-color: #b5a48e !important;
+      box-shadow: 0 8px 24px -4px rgba(28, 25, 23, 0.12) !important;
+    }
+
+    /* Dark Mode Borders */
+    [data-theme="dark"] .card,
+    [data-theme="dark"] .campus-stat-card,
+    [data-theme="dark"] .campus-card,
+    [data-theme="dark"] .campus-hero-banner,
+    [data-theme="dark"] .campus-lookup-card,
+    [data-theme="dark"] .campus-feed-card,
+    [data-theme="dark"] .card--month,
+    [data-theme="dark"] #mix,
+    [data-theme="dark"] #top-contacts,
+    [data-theme="dark"] .bento-insights-grid .card,
+    [data-theme="dark"] .hero-logo-showcase {
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5) !important;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- ── 0. Cinematic Startup Intro Splash (Clean Logo, No Text Clutter) ── -->
+  <div id="startupSplash" onclick="dismissSplash()" title="Click anywhere to proceed">
+    <div class="ambient-glow-circle"></div>
+    <div class="splash-logo-container">
+      <img id="splashLogoImg" src="logo-dark.png" alt="CampusDesk Official Logo" class="splash-logo-img" />
+    </div>
+  </div>
+
+  <div class="app">
+
+    <!-- ── 1. Collapsible Sidebar Rail (Modern Pill Design) ───────────────────── -->
+    <nav class="rail" id="appSidebar" aria-label="Main navigation">
+      <div class="rail__panel" id="rail-panel">
+        <a class="rail__logo" href="javascript:void(0)" onclick="navigate('overview')" aria-label="CampusDesk, overview">
+          <span class="rail__mark">
+            <img class="campus-logo-img" src="logo-dark.png" alt="Logo" style="width: 26px; height: 26px; object-fit: contain;">
+          </span>
+          <span class="rail__brand" aria-hidden="true">CampusDesk</span>
+        </a>
+
+        <div class="rail__list">
+          <div class="rail__pill" aria-hidden="true" style="opacity: 1; transform: translate(0px, 0px);"></div>
+          <ul class="rail__ul" role="list">
+            <li>
+              <button class="rail__item is-active" data-page="overview" onclick="navigate('overview')" style="--i: 1;" aria-current="page">
+                <span class="rail__icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="2"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="2"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="2"></rect></svg>
+                </span>
+                <span class="rail__label">Overview</span>
+              </button>
+            </li>
+            <li>
+              <button class="rail__item" data-page="chat" onclick="navigate('chat')" style="--i: 2;">
+                <span class="rail__icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5V17A2.5 2.5 0 0 1 4 14.5z"></path></svg>
+                  <span class="rail__badge" id="sidebarChatBadge" aria-hidden="true">AI</span>
+                </span>
+                <span class="rail__label">AI Assistant</span>
+              </button>
+            </li>
+            <li>
+              <button class="rail__item" data-page="report" onclick="navigate('report')" style="--i: 3;">
+                <span class="rail__icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+                </span>
+                <span class="rail__label">Report Issue</span>
+              </button>
+            </li>
+            <li>
+              <button class="rail__item" data-page="track" onclick="navigate('track')" style="--i: 4;">
+                <span class="rail__icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg>
+                </span>
+                <span class="rail__label">Track Status</span>
+              </button>
+            </li>
+            <li>
+              <button class="rail__item" data-page="admin" onclick="navigate('admin')" style="--i: 5;">
+                <span class="rail__icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.5 3.5 10.6l6.6 2.8 2.8 6.6z"></path><path d="m10.1 13.4 4.2-4.2"></path></svg>
+                  <span class="rail__badge" id="sidebarCriticalBadge" aria-hidden="true">0</span>
+                </span>
+                <span class="rail__label">Staff Triage Desk</span>
+              </button>
+            </li>
+            <li>
+              <button class="rail__item" data-page="about" onclick="navigate('about')" style="--i: 6;">
+                <span class="rail__icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 8h.01M11 12h1v4h1"></path></svg>
+                </span>
+                <span class="rail__label">About & System</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+
+
+
+        <!-- Sidebar Expand / Collapse Toggle -->
+        <button class="rail__item rail__toggle" id="rail-toggle" type="button" aria-controls="rail-panel" aria-expanded="false" onclick="toggleSidebar()" aria-keyshortcuts="[" style="--i: 9;">
+          <span class="rail__icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="3"></rect><path d="M9.5 4v16"></path><path class="rail__chev" d="m13.5 10 2 2-2 2"></path></svg>
+          </span>
+          <span class="rail__label">Expand sidebar</span>
+        </button>
+      </div>
+      <span class="rail__tip" id="rail-tip" aria-hidden="true">Overview</span>
+    </nav>
+
+    <!-- ── 2. Top Bar (With Search, Sync, Audit, Clear, Dark/Light Mode) ───────── -->
+    <header class="top">
+      <div class="top__hello">
+        <h1 class="top__title" id="topbarPageTitle" tabindex="-1">
+          <span class="w">Campus</span> <strong class="w" id="topbarCurrentViewName">Desk</strong>
+        </h1>
+        <p class="top__sub" id="topbarPageSub">Here’s how your campus operations moved today.</p>
+      </div>
+
+      <div class="top__tools">
+        <!-- Global Search Bar with ⌘K -->
+        <div class="search" role="search">
+          <label class="sr-only" for="topGlobalSearch">Search incidents and reference IDs</label>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path></svg>
+          <input id="topGlobalSearch" type="text" placeholder="Search (⌘K)" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter') executeQuickSearchTrack();">
+          <kbd aria-hidden="true">⌘K</kbd>
+        </div>
+
+        <!-- Rotating Sync Button -->
+        <button class="sync" id="syncBtn" type="button" onclick="refreshData(true)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 0 1-14.3 4.9M4 12A8 8 0 0 1 18.3 7.1"></path><path d="M18.5 3v4.3h-4.3M5.5 21v-4.3h4.3"></path></svg>
+          <span class="sync__text">
+            <span class="sync__label">Last sync</span>
+            <span class="sync__when" id="sync-when">Just now</span>
+          </span>
+        </button>
+
+        <!-- History Audit Button -->
+        <button class="quick-pill-btn" onclick="exportAuditSpreadsheet()" title="Download complete incident audit spreadsheet (.CSV)">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <span>History Audit</span>
+        </button>
+
+        <!-- Clear History Button -->
+        <button class="quick-pill-btn" onclick="clearAllHistory()" title="Clear all incident history and audit records" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.35);">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          <span>Clear History</span>
+        </button>
+
+        <!-- Water Droplet Dark/Light Theme Switcher -->
+        <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Water-Droplet Smooth Dark/Light Mode" aria-label="Toggle theme">
+          <svg id="themeIconSun" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg id="themeIconMoon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        </button>
+
+        <!-- Persona Role Switcher -->
+        <div class="persona-pill">
+          <button id="btnStudentRole" class="persona-btn active" onclick="switchRole('student')">Student</button>
+          <button id="btnAdminRole" class="persona-btn" onclick="switchRole('admin')">Staff</button>
+        </div>
+
+        <!-- Website Logo Avatar -->
+        <button class="avatar" id="account" type="button" aria-label="CampusDesk Logo & Account" onclick="showToast('CampusDesk Operations Desk · All systems normal')">
+          <img id="topbarLogoImg" class="topbar-logo-img" src="logo-transparent.png" alt="CampusDesk Logo" />
+        </button>
+      </div>
+    </header>
+
+    <!-- ── 3. Main Views Container ─────────────────────────────────────────── -->
+    <main class="views" id="main">
+
+      <!-- ══════════════════════════════════════════════════════════════════════
+           VIEW 1: OVERVIEW DASHBOARD (EXACT SCREENSHOT 1 ELEMENTS IN MODERN UI)
+           ══════════════════════════════════════════════════════════════════════ -->
+      <section class="view-pane active" id="view-overview" data-view="overview" aria-labelledby="topbarPageTitle">
+        
+        <!-- 1. Hero Banner with University Dispatch & Official Logo -->
+        <div class="campus-hero-banner">
+          <div class="hero-content">
+            <div class="hero-badge">
+              <span class="live-dot"></span>
+              <span>Metropolitan Central University Dispatch</span>
+            </div>
+            <h1 class="hero-title">Intelligent Campus Operations & Triage</h1>
+            <p class="hero-desc">
+              Real-time incident stream, automated severity triage with instant keyword escalation, and student resolution monitoring.
+            </p>
+            <div class="hero-actions">
+              <button type="button" class="btn-action btn-primary-glow" onclick="navigate('report')">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                <span>Report Incident</span>
+              </button>
+              <button type="button" class="btn-action btn-ghost-dark" onclick="navigate('chat')">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                <span>Ask AI Assistant</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="hero-logo-showcase" title="CampusDesk Official Logo">
+            <img id="heroLogoImg" src="logo-transparent.png" alt="CampusDesk Official Logo" class="hero-logo-img" />
+          </div>
+        </div>
+
+        <!-- 2. 4-Card Stats Grid (Screenshot 1 Exact Metrics in Modern Style) -->
+        <div class="campus-stats-grid">
+          <!-- Card 1: Total Reports -->
+          <div class="card campus-stat-card">
+            <div class="stat-header">
+              <span class="stat-label">Total Reports</span>
+              <div class="stat-icon-wrapper" style="color: var(--c-tangerine); background: var(--c-tangerine-soft);">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              </div>
+            </div>
+            <div class="stat-number" id="dashTotalNum">0</div>
+            <div class="stat-trend">
+              <span class="chip chip--up">Live</span> Secure localStorage storage
+            </div>
+          </div>
+
+          <!-- Card 2: Pending / Triage -->
+          <div class="card campus-stat-card">
+            <div class="stat-header">
+              <span class="stat-label">Pending / Triage</span>
+              <div class="stat-icon-wrapper" style="color: #f59e0b; background: rgba(245, 158, 11, 0.15);">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+            </div>
+            <div class="stat-number" id="dashPendingNum">0</div>
+            <div class="stat-trend">
+              <span class="trend-warn">Needs dispatcher inspection</span>
+            </div>
+          </div>
+
+          <!-- Card 3: In Progress -->
+          <div class="card campus-stat-card">
+            <div class="stat-header">
+              <span class="stat-label">In Progress</span>
+              <div class="stat-icon-wrapper" style="color: var(--c-violet); background: var(--c-violet-soft);">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+              </div>
+            </div>
+            <div class="stat-number" id="dashProgressNum">0</div>
+            <div class="stat-trend">
+              <span class="chip chip--up" style="background: var(--c-violet-soft); color: var(--c-violet);">Dispatched</span> On-site technicians
+            </div>
+          </div>
+
+          <!-- Card 4: Resolved -->
+          <div class="card campus-stat-card">
+            <div class="stat-header">
+              <span class="stat-label">Resolved</span>
+              <div class="stat-icon-wrapper" style="color: var(--good); background: var(--good-bg);">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+            </div>
+            <div class="stat-number" id="dashResolvedNum">0</div>
+            <div class="stat-trend">
+              <span class="chip chip--up" id="dashResolutionRate">0%</span> Resolution rate
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Instant Ticket Lookup Card (Screenshot 1 Exact Element) -->
+        <div class="card campus-lookup-card">
+          <div class="card-header-row">
+            <div>
+              <h3 class="card__title" style="font-size: 1.15rem;">Instant Ticket Lookup</h3>
+              <p style="font-size: var(--fs-sm); color: var(--ink-3); margin-top: 2px;">
+                Enter your unique tracking reference to inspect resolution milestone timeline.
+              </p>
+            </div>
+          </div>
+          <form onsubmit="event.preventDefault(); executeQuickTrack();" style="display: flex; gap: 10px; margin-top: 14px;">
+            <input
+              type="text"
+              id="quickTrackInput"
+              class="form-control"
+              placeholder="Enter reference code (e.g. CAM-20261102-XXXX)..."
+              style="font-family: var(--font-mono); font-size: 13.5px;"
+            />
+            <button type="submit" class="btn-action btn-primary-glow" style="padding: 10px 24px;">
+              Lookup
+            </button>
+          </form>
+        </div>
+
+        <!-- 4. Active Incident Feed Card (Screenshot 1 Exact Element) -->
+        <div class="card campus-feed-card">
+          <div class="card__head" style="margin-bottom: 16px;">
+            <div>
+              <h3 class="card__title" style="font-size: 1.15rem;">Active Incident Feed</h3>
+              <p style="font-size: var(--fs-sm); color: var(--ink-3); margin-top: 2px;">
+                Latest reported campus disruptions and facility updates
+              </p>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button type="button" class="quick-pill-btn" onclick="exportAuditSpreadsheet()" title="Download complete incident audit spreadsheet (.CSV)">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span>History Audit</span>
+              </button>
+              <button type="button" class="quick-pill-btn" onclick="navigate('admin')">
+                <span>View Full Triage Desk &rarr;</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Reference</th>
+                  <th>Incident Title</th>
+                  <th>Location</th>
+                  <th>Priority</th>
+                  <th>Department</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="overviewRecentTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        
+        <!-- 5. Monthly Reports Calculation Diagram (Reports by Month: Submitted vs Solved) -->
+        <article class="card card--month" id="month" aria-labelledby="month-h" style="margin-bottom: 24px;">
+          <div class="card__head">
+            <div>
+              <h2 class="card__title" id="month-h">Reports by month</h2>
+              <ul class="legend" role="list">
+                <li><i class="key key--solid"></i>Solved</li>
+                <li><i class="key key--hatch"></i>Submitted</li>
+              </ul>
+            </div>
+            <div class="seg" role="group" aria-label="Year" data-seg="month">
+              <button type="button" id="btnYear2026" class="is-active" onclick="setChartYear(2026)">2026</button>
+              <button type="button" id="btnYear2025" onclick="setChartYear(2025)">2025</button>
+            </div>
+          </div>
+          <div class="cols" id="month-chart" tabindex="0" role="group" aria-label="Reports by month: calculated dynamically from submitted and solved records.">
+            <!-- Dynamic SVG diagram rendered by updateMonthlyDiagram() -->
+          </div>
+        </article>
+
+        <!-- 5. Operations Insights (Complementary Bento Cards) -->
+        <div class="bento-insights-grid">
+          <article class="card" id="mix" aria-labelledby="mix-h">
+            <div class="card__head">
+              <h2 class="card__title" id="mix-h">Category mix</h2>
+              <div class="seg" role="group" aria-label="Period">
+                <button type="button" class="is-active" id="btnMixMonth" onclick="setMixPeriod('month')">This month</button>
+                <button type="button" id="btnMixLast" onclick="setMixPeriod('last')">Last</button>
+              </div>
+            </div>
+            <div class="mix">
+              <div class="donut" id="mix-chart" role="img" aria-label="Share of messages by channel">
+                <svg viewBox="0 0 140 140" aria-hidden="true">
+                  <circle class="donut__track" cx="70" cy="70" r="52" fill="none" stroke-width="16"></circle>
+                  <circle cx="70" cy="70" r="52" fill="none" stroke="var(--c-tangerine)" stroke-width="16" stroke-linecap="round" stroke-dasharray="148.9 326.7" stroke-dashoffset="-10.5"></circle>
+                  <circle cx="70" cy="70" r="52" fill="none" stroke="var(--c-teal)" stroke-width="16" stroke-linecap="round" stroke-dasharray="80.3 326.7" stroke-dashoffset="-180.4"></circle>
+                  <circle cx="70" cy="70" r="52" fill="none" stroke="var(--c-violet)" stroke-width="16" stroke-linecap="round" stroke-dasharray="34.5 326.7" stroke-dashoffset="-281.7"></circle>
+                </svg>
+                <div class="donut__center"><b>9.4K</b><span>reports</span></div>
+              </div>
+              <ul class="mix__legend" role="list">
+                <li><i class="dot" style="background: var(--c-tangerine)"></i><span class="name">Facilities</span><span class="pct">52%</span><span class="chip chip--up"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 8.5 5 5.5l2 2L10 4.5M7.5 4.5H10V7"></path></svg>2.1%</span></li>
+                <li><i class="dot" style="background: var(--c-teal)"></i><span class="name">IT & Wi-Fi</span><span class="pct">31%</span><span class="chip chip--up"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 8.5 5 5.5l2 2L10 4.5M7.5 4.5H10V7"></path></svg>4.6%</span></li>
+                <li><i class="dot" style="background: var(--c-violet)"></i><span class="name">Safety / AV</span><span class="pct">17%</span><span class="chip chip--down"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 8.5 5 5.5l2 2L10 4.5M7.5 4.5H10V7"></path></svg>3.8%</span></li>
+              </ul>
+            </div>
+          </article>
+          <article class="card" id="top-contacts" aria-labelledby="top-h">
+            <div class="card__head">
+              <h2 class="card__title" id="top-h">Top response teams</h2>
+              <div class="seg" role="group" aria-label="Period">
+                <button type="button" class="is-active" id="btnTopWeek" onclick="setTopRange('week')">Week</button>
+                <button type="button" id="btnTopMonth" onclick="setTopRange('month')">Month</button>
+              </div>
+            </div>
+            <ol class="people" id="people">
+              <li class="person">
+                <span class="person__av" aria-hidden="true">FM</span>
+                <div class="person__who">
+                  <span class="person__name">Facilities & Janitorial<span class="person__mail">facilities@campusdesk.edu</span></span>
+                  <span class="person__bar" aria-hidden="true"><i style="--s: 1;"></i></span>
+                </div>
+                <span class="person__num">486<small>32%</small></span>
+              </li>
+              <li class="person">
+                <span class="person__av" aria-hidden="true">IT</span>
+                <div class="person__who">
+                  <span class="person__name">Network & IT Ops<span class="person__mail">it-help@campusdesk.edu</span></span>
+                  <span class="person__bar" aria-hidden="true"><i style="--s: 0.72;"></i></span>
+                </div>
+                <span class="person__num">352<small>23%</small></span>
+              </li>
+              <li class="person">
+                <span class="person__av" aria-hidden="true">AV</span>
+                <div class="person__who">
+                  <span class="person__name">Academic Media Services<span class="person__mail">av@campusdesk.edu</span></span>
+                  <span class="person__bar" aria-hidden="true"><i style="--s: 0.61;"></i></span>
+                </div>
+                <span class="person__num">297<small>20%</small></span>
+              </li>
+              <li class="person">
+                <span class="person__av" aria-hidden="true">CS</span>
+                <div class="person__who">
+                  <span class="person__name">Campus Safety Dispatch<span class="person__mail">security@campusdesk.edu</span></span>
+                  <span class="person__bar" aria-hidden="true"><i style="--s: 0.44;"></i></span>
+                </div>
+                <span class="person__num">214<small>14%</small></span>
+              </li>
+              <li class="person">
+                <span class="person__av" aria-hidden="true">EM</span>
+                <div class="person__who">
+                  <span class="person__name">Electrical Maintenance<span class="person__mail">electric@campusdesk.edu</span></span>
+                  <span class="person__bar" aria-hidden="true"><i style="--s: 0.35;"></i></span>
+                </div>
+                <span class="person__num">168<small>11%</small></span>
+              </li>
+            </ol>
+          </article>
+        </div>
+
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════════════
+           VIEW 2: CHAT AI ASSISTANT
+           ══════════════════════════════════════════════════════════════════════ -->
+      <section class="view-pane" id="view-chat" data-view="chat" style="display: none;">
+        <div style="max-width: 860px; margin: 0 auto; width: 100%;">
+          <div style="margin-bottom: 20px;">
+            <h2 style="font-family: var(--font-display); font-size: 1.75rem; font-weight: 700;">CampusDesk Conversational AI</h2>
+            <p style="font-size: var(--fs-sm); color: var(--ink-3); margin-top: 4px;">Grounded campus assistance for library hours, Wi-Fi onboarding, shuttle bus timings, and campus safety.</p>
+          </div>
+
+          <div class="campus-chat-box">
+            <div class="chat-scroll-area" id="chatArea"></div>
+            <div class="chat-composer-bar">
+              <input id="chatTextInput" type="text" class="form-control" placeholder="Ask a question (e.g. When does the library close? How to get classroom projector remote?)..." onkeydown="if(event.key==='Enter') sendChatMessage();" />
+              <button class="btn-action btn-primary-glow" onclick="sendChatMessage()">Send</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════════════
+           VIEW 3: REPORT ISSUE FORM
+           ══════════════════════════════════════════════════════════════════════ -->
+      <section class="view-pane" id="view-report" data-view="report" style="display: none;">
+        <div style="max-width: 720px; margin: 0 auto; width: 100%;">
+          
+          <div class="card" id="formCard">
+            <h2 style="font-family: var(--font-display); font-size: 1.75rem; font-weight: 700; margin-bottom: 6px;">Report a Campus Issue</h2>
+            <p style="font-size: var(--fs-sm); color: var(--ink-3); margin-bottom: 24px;">Submit facility incidents for automated AI/rule triage and immediate department routing.</p>
+
+            <div id="safetyWarningBox" style="display: none; background: var(--bad-bg); border: 1px solid var(--bad); border-radius: var(--r-sm); padding: 16px; margin-bottom: 24px; color: var(--bad); font-size: var(--fs-sm);">
+              <strong>⚠️ Immediate Danger Alert:</strong> For active fires, gas leaks, physical violence, or live wires, call Campus Security Dispatch immediately at <strong>Ext: 555-0911</strong>.
+            </div>
+
+            <form onsubmit="handleFormSubmission(event)">
+              <div class="form-row">
+                <label class="form-label" for="fStudent">Student Name or ID *</label>
+                <input id="fStudent" type="text" class="form-control" required placeholder="e.g. Alex Morgan (ID: STU-7821)" minlength="2" maxlength="60" />
+                <span style="font-size: 11px; color: var(--ink-3); margin-top: 4px; display: block;">Student identity stays in browser storage and is never sent to external providers.</span>
+              </div>
+
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+                <div class="form-row">
+                  <label class="form-label" for="fCategory">Category *</label>
+                  <select id="fCategory" class="form-control" onchange="toggleSafetyWarning()">
+                    <option value="Classroom/Projector">Classroom/Projector</option>
+                    <option value="Wi-Fi/Internet">Wi-Fi/Internet</option>
+                    <option value="Washroom/Cleanliness">Washroom/Cleanliness</option>
+                    <option value="Fan/AC">Fan/AC</option>
+                    <option value="Electricity">Electricity</option>
+                    <option value="Transportation">Transportation</option>
+                    <option value="Campus Safety">Campus Safety</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div class="form-row">
+                  <label class="form-label" for="fLocation">Campus Location *</label>
+                  <input id="fLocation" type="text" class="form-control" required placeholder="e.g. Science Block, Room 302" minlength="2" maxlength="80" />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <label class="form-label" for="fTitle">Incident Title *</label>
+                <input id="fTitle" type="text" class="form-control" required placeholder="e.g. Projector lamp blown out in lecture hall" minlength="5" maxlength="100" />
+              </div>
+
+              <div class="form-row">
+                <label class="form-label" for="fDesc">Detailed Description *</label>
+                <textarea id="fDesc" class="form-control" rows="4" required placeholder="Describe what happened, any visible hazard, and student impact..." minlength="10" maxlength="1000"></textarea>
+              </div>
+
+              <button type="submit" class="btn-action btn-primary-glow" style="width: 100%; padding: 14px; font-size: 1rem;">
+                Submit & Run Automated Triage
+              </button>
+            </form>
+          </div>
+
+          <!-- Confirmation Card -->
+          <div class="card" id="confirmCard" style="display: none; text-align: center; padding: 36px 28px;">
+            <div style="width: 64px; height: 64px; border-radius: 50%; background: var(--good-bg); color: var(--good); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+              <svg width="34" height="34" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <h2 style="font-family: var(--font-display); font-size: 1.75rem; font-weight: 700; margin-bottom: 6px;">Report Logged Successfully</h2>
+            <p style="font-size: var(--fs-sm); color: var(--ink-3); margin-bottom: 24px;">Your report has been auto-classified and entered into the university dispatch system.</p>
+
+            <div style="background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 18px; margin-bottom: 20px;">
+              <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--ink-3);">Tracking Reference</div>
+              <div id="cId" style="font-family: var(--font-mono); font-size: 22px; font-weight: 800; color: var(--c-tangerine); margin: 6px 0;">CAM-20261102-XXXX</div>
+            </div>
+
+            <div style="border: 1px solid var(--line); border-radius: var(--r-sm); padding: 20px; text-align: left; margin-bottom: 24px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <span id="cPriorityBadge" class="badge badge-medium">Medium</span>
+                <span class="badge" style="background: var(--surface-2); color: var(--ink-3); border: 1px solid var(--line);">Rule-based suggestion</span>
+              </div>
+              <div style="margin-bottom: 8px; font-size: var(--fs-sm);"><strong>Assigned Dept:</strong> <span id="cDept">Academic AV</span></div>
+              <div style="margin-bottom: 8px; font-size: var(--fs-sm);"><strong>Recommended Next Action:</strong> <span id="cAction">Queued for review.</span></div>
+              <div style="font-size: 11px; color: var(--ink-3); border-top: 1px solid var(--line); padding-top: 10px; margin-top: 10px;">
+                Automated suggestion. Not a verified decision. Staff supervisor will verify.
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+              <button class="btn-action btn-primary-glow" onclick="trackFromConfirmation()">Track Resolution Timeline</button>
+              <button class="btn-action btn-ghost-dark" onclick="resetFormCard()">Submit Another Report</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════════════
+           VIEW 4: TRACK STATUS TIMELINE
+           ══════════════════════════════════════════════════════════════════════ -->
+      <section class="view-pane" id="view-track" data-view="track" style="display: none;">
+        <div style="max-width: 800px; margin: 0 auto; width: 100%;">
+          <div style="margin-bottom: 20px;">
+            <h2 style="font-family: var(--font-display); font-size: 1.75rem; font-weight: 700;">Ticket Lifecycle Tracking</h2>
+            <p style="font-size: var(--fs-sm); color: var(--ink-3); margin-top: 4px;">Enter reference ID to view 4-stage resolution timeline and technician audit notes.</p>
+          </div>
+
+          <div class="card" style="margin-bottom: 24px;">
+            <div style="display: flex; gap: 10px;">
+              <input id="tInput" type="text" class="form-control" placeholder="Enter Reference ID (e.g. CAM-20261102-A81F)..." style="font-family: var(--font-mono);" onkeydown="if(event.key==='Enter') executeTrackSearch();" />
+              <button class="btn-action btn-primary-glow" onclick="executeTrackSearch()">Lookup</button>
+            </div>
+          </div>
+
+          <div id="tResultBox" style="display: none;"></div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════════════
+           VIEW 5: STAFF ADMIN TRIAGE DESK
+           ══════════════════════════════════════════════════════════════════════ -->
+      <section class="view-pane" id="view-admin" data-view="admin" style="display: none;">
+        <div class="card">
+          <div class="card__head" style="margin-bottom: 20px; flex-wrap: wrap; gap: 14px;">
+            <div>
+              <h2 style="font-family: var(--font-display); font-size: 1.75rem; font-weight: 700;">Staff Admin Triage Desk</h2>
+              <p style="font-size: var(--fs-sm); color: var(--ink-3); margin-top: 2px;">Search, filter, update workflow status, and override automated assignments.</p>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button class="btn-action btn-primary-glow" onclick="exportAuditSpreadsheet()" title="Download complete incident audit spreadsheet (.CSV)">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span>History Audit (.CSV)</span>
+              </button>
+              <button class="btn-action btn-ghost-dark" onclick="clearAllHistory()" title="Reset local storage logs">
+                Reset History
+              </button>
+            </div>
+          </div>
+
+          <!-- Filters Row -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; background: var(--surface-2); padding: 14px; border-radius: var(--r-sm); border: 1px solid var(--line);">
+            <div>
+              <label class="form-label" for="adminSearch">Search Records</label>
+              <input id="adminSearch" type="text" class="form-control" placeholder="Search reference, title, student..." oninput="filterAdminTable()" />
+            </div>
+            <div>
+              <label class="form-label" for="adminStatusSelect">Status</label>
+              <select id="adminStatusSelect" class="form-control" onchange="filterAdminTable()">
+                <option value="ALL">All Statuses</option>
+                <option value="Submitted">Submitted</option>
+                <option value="Under Review">Under Review</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Resolved">Resolved</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" for="adminCategorySelect">Category</label>
+              <select id="adminCategorySelect" class="form-control" onchange="filterAdminTable()">
+                <option value="ALL">All Categories</option>
+                <option value="Classroom/Projector">Classroom/Projector</option>
+                <option value="Wi-Fi/Internet">Wi-Fi/Internet</option>
+                <option value="Washroom/Cleanliness">Washroom/Cleanliness</option>
+                <option value="Fan/AC">Fan/AC</option>
+                <option value="Electricity">Electricity</option>
+                <option value="Transportation">Transportation</option>
+                <option value="Campus Safety">Campus Safety</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" for="adminPrioritySelect">Priority</label>
+              <select id="adminPrioritySelect" class="form-control" onchange="filterAdminTable()">
+                <option value="ALL">All Priorities</option>
+                <option value="Critical">Critical</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Table Container -->
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Ticket ID</th>
+                  <th>Student Info</th>
+                  <th>Title & Location</th>
+                  <th>Priority</th>
+                  <th>Department</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="adminTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════════════
+           VIEW 6: ABOUT GUIDE & SYSTEM DISCLOSURES
+           ══════════════════════════════════════════════════════════════════════ -->
+      <section class="view-pane" id="view-about" data-view="about" style="display: none;">
+        <div style="max-width: 840px; margin: 0 auto; width: 100%;">
+          <div class="card">
+            <h2 style="font-family: var(--font-display); font-size: 1.75rem; font-weight: 700; margin-bottom: 12px;">About CampusDesk & Technical Disclosures</h2>
+            <p style="font-size: var(--fs-sm); color: var(--ink-3); line-height: 1.6; margin-bottom: 24px;">
+              CampusDesk is an interactive university help desk designed with automated priority escalation, grounded AI assistance, and transparent lifecycle tracking.
+            </p>
+
+            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 8px;">System Architecture & Features:</h3>
+            <ul style="font-size: var(--fs-sm); color: var(--ink-2); line-height: 1.8; margin-left: 20px; margin-bottom: 24px;">
+              <li><strong>Local Storage Scope:</strong> Reports persist securely on your machine in <code style="font-family: var(--font-mono); background: var(--surface-2); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--line);">campusdesk_records_live</code>. No external data telemetry.</li>
+              <li><strong>Automated Keyword Escalation:</strong> Words indicating danger (e.g. fire, sparks, exposed wire, threat) immediately trigger <span class="badge badge-critical">Critical</span> emergency dispatch.</li>
+              <li><strong>Offline Capabilities:</strong> Built with local standalone assets, enabling inspection, chat, and triage even when offline.</li>
+            </ul>
+
+            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 8px;">Campus Department Contacts:</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 12px;">
+              <div style="background: var(--surface-2); padding: 14px; border-radius: var(--r-sm); border: 1px solid var(--line);">
+                <strong style="display: block; font-size: 13.5px;">Campus Security (24/7)</strong>
+                <span style="font-size: 12px; color: var(--c-tangerine); font-weight: 600;">Ext: 555-0911</span>
+              </div>
+              <div style="background: var(--surface-2); padding: 14px; border-radius: var(--r-sm); border: 1px solid var(--line);">
+                <strong style="display: block; font-size: 13.5px;">IT Desk & Wi-Fi</strong>
+                <span style="font-size: 12px; color: var(--c-teal); font-weight: 600;">Ext: 555-0199</span>
+              </div>
+              <div style="background: var(--surface-2); padding: 14px; border-radius: var(--r-sm); border: 1px solid var(--line);">
+                <strong style="display: block; font-size: 13.5px;">Facilities & Maintenance</strong>
+                <span style="font-size: 12px; color: var(--c-violet); font-weight: 600;">Ext: 555-0144</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Admin Edit Modal -->
+  <div class="campus-modal-backdrop" id="adminEditModal">
+    <div class="campus-modal-window">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700;">Staff Triage Override</h3>
+        <button onclick="closeEditModal()" style="background: transparent; border: none; font-size: 20px; cursor: pointer; color: var(--ink-3);">✕</button>
+      </div>
+      <div id="modalFormInject"></div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" style="position: fixed; bottom: 24px; right: 24px; z-index: 10000; display: flex; flex-direction: column; gap: 8px;"></div>
+
+  <!-- ── 4. Master Application Logic ──────────────────────────────────────── -->
+  <script>
+    // --- WATER DROPLET THEME SWITCHER ---
+    let currentTheme = localStorage.getItem('campusdesk_theme') || 'light';
+
+    function applyTheme(theme) {
+      currentTheme = theme;
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('campusdesk_theme', theme);
+
+      const sun = document.getElementById('themeIconSun');
+      const moon = document.getElementById('themeIconMoon');
+      if (sun && moon) {
+        if (theme === 'dark') {
+          sun.style.display = 'block';
+          moon.style.display = 'none';
+        } else {
+          sun.style.display = 'none';
+          moon.style.display = 'block';
+        }
+      }
+
+      // Sidebar rail is dark in both themes -> logo-dark.png
+      document.querySelectorAll('.rail .campus-logo-img').forEach(img => img.src = 'logo-dark.png');
+      // Hero banner is light in light mode -> logo-transparent.png (dark text); dark in dark mode -> logo-dark.png (white text)
+      const heroLogoFile = (theme === 'dark') ? 'logo-dark.png' : 'logo-transparent.png';
+      document.querySelectorAll('.hero-logo-img').forEach(img => img.src = heroLogoFile);
+      // Topbar logo avatar
+      const topbarLogoFile = (theme === 'dark') ? 'logo-dark.png' : 'logo-transparent.png';
+      document.querySelectorAll('.topbar-logo-img').forEach(img => img.src = topbarLogoFile);
+    }
+
+    function toggleTheme() {
+      const next = currentTheme === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      showToast('Switched to ' + (next === 'dark' ? 'Midnight Obsidian' : 'Clean Editorial Light') + ' mode');
+    }
+
+    // Quick Track Form Action
+    function executeQuickTrack() {
+      const input = document.getElementById('quickTrackInput');
+      if (!input || !input.value.trim()) return;
+      const ref = input.value.trim().toUpperCase();
+      navigate('track');
+      const trackInput = document.getElementById('trackSearchInput');
+      if (trackInput) {
+        trackInput.value = ref;
+        executeTrackSearch();
+      }
+    }
+
+    
+    const STORAGE_KEY = "campusdesk_records_live";
+
+    // Clean slate: No demo pre-seeded reports. Ready for manual report entry.
+    const DEFAULT_REPORTS = [];
+    const DEMO_PRESEED_IDS = ["CAM-20261102-A81F", "CAM-20261102-K49B", "CAM-20261101-92A1", "CAM-20261101-H18C"];
+
+    function getStorageReports() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw !== null) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            // Strip out any previously cached demo seed reports
+            const cleaned = parsed.filter(r => !DEMO_PRESEED_IDS.includes(r.id));
+            if (cleaned.length !== parsed.length) {
+              saveStorageReports(cleaned);
+            }
+            return cleaned;
+          }
+        }
+      } catch (e) {
+        console.error("Storage read error:", e);
+      }
+      return [];
+    }
+
+    function saveStorageReports(arr) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+      } catch (e) {
+        console.error("Storage write error:", e);
+      }
+    }
+
+    // --- TOAST NOTIFICATIONS ---
+    let toastTimeout = null;
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      if (!toast) return;
+      toast.textContent = msg;
+      toast.style.display = 'block';
+      if (window.gsap) {
+        gsap.killTweensOf(toast);
+        gsap.fromTo(toast, 
+          { y: 30, opacity: 0 }, 
+          { y: 0, opacity: 1, duration: 0.35, ease: 'back.out(1.8)' }
+        );
+      } else {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+      }
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        if (window.gsap) {
+          gsap.to(toast, {
+            y: 20,
+            opacity: 0,
+            duration: 0.25,
+            ease: 'power2.in',
+            onComplete: () => { toast.style.display = 'none'; }
+          });
+        } else {
+          toast.style.display = 'none';
+        }
+      }, 3500);
+    }
+
+    // --- CLEAR ALL HISTORY ---
+    function clearAllHistory() {
+      const reports = getStorageReports();
+      const count = reports.length;
+      const msg = count > 0 
+        ? "Are you sure you want to clear all " + count + " received incident reports and history audit logs? This action cannot be undone."
+        : "Are you sure you want to reset all incident history and audit records?";
+
+      if (confirm(msg)) {
+        saveStorageReports([]);
+        messages = [
+          {
+            sender: "bot",
+            text: "Hello! I am your CampusDesk Assistant. How can I assist you with university life today? Ask about library study hours, campus Wi-Fi, classroom AV remotes, shuttle schedules, or emergency contacts.",
+            chips: ["Library opening hours & study rooms", "How to connect to campus Wi-Fi", "Shuttle bus schedule", "Emergency campus contacts"]
+          }
+        ];
+        renderChatWindow();
+        refreshData();
+        const tBox = document.getElementById('tResultBox');
+        if (tBox) tBox.style.display = 'none';
+        const tInput = document.getElementById('tInput');
+        if (tInput) tInput.value = '';
+        showToast("All incident records and audit history have been cleared.");
+      }
+    }
+
+    // --- HISTORY AUDIT SPREADSHEET EXPORT (.CSV) ---
+    function exportAuditSpreadsheet() {
+      const reports = getStorageReports();
+      if (!reports || reports.length === 0) {
+        alert("No incident reports received yet to export. Please submit an issue report first.");
+        return;
+      }
+
+      const headers = [
+        "Ticket ID",
+        "Submission Timestamp",
+        "Last Updated",
+        "Student Name / ID",
+        "Category",
+        "Campus Location",
+        "Incident Title",
+        "Description",
+        "Priority",
+        "Assigned Department",
+        "Automated Next Action",
+        "Current Status",
+        "Complete Audit History Log"
+      ];
+
+      function escapeCSV(val) {
+        if (val === null || val === undefined) return '""';
+        const str = String(val).replace(/"/g, '""');
+        return '"' + str + '"';
+      }
+
+      const rows = reports.map(r => {
+        const historyTrail = (r.history || [])
+          .map(h => "[" + (h.at ? new Date(h.at).toLocaleString() : '') + "] " + h.status + (h.note ? ' - Note: ' + h.note : ''))
+          .join(" | ");
+
+        return [
+          escapeCSV(r.id),
+          escapeCSV(r.createdAt ? new Date(r.createdAt).toLocaleString() : ""),
+          escapeCSV(r.updatedAt ? new Date(r.updatedAt).toLocaleString() : (r.createdAt ? new Date(r.createdAt).toLocaleString() : "")),
+          escapeCSV(r.studentName || ""),
+          escapeCSV(r.category || ""),
+          escapeCSV(r.location || ""),
+          escapeCSV(r.title || ""),
+          escapeCSV(r.description || ""),
+          escapeCSV(r.priority || ""),
+          escapeCSV(r.suggestedDepartment || ""),
+          escapeCSV(r.suggestedAction || ""),
+          escapeCSV(r.status || ""),
+          escapeCSV(historyTrail)
+        ].join(",");
+      });
+
+      const csvString = "\uFEFF" + [headers.map(escapeCSV).join(","), ...rows].join("\r\n");
+      const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+      const downloadUrl = URL.createObjectURL(blob);
+      const downloadLink = document.createElement("a");
+      const today = new Date().toISOString().slice(0, 10);
+      downloadLink.setAttribute("href", downloadUrl);
+      downloadLink.setAttribute("download", "CampusDesk_Audit_Export_" + today + ".csv");
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      URL.revokeObjectURL(downloadUrl);
+      showToast("Audit export spreadsheet (.CSV) downloaded.");
+    }
+
+    // --- INTRO SPLASH CONTROL ---
+    function dismissSplash() {
+      const splash = document.getElementById('startupSplash');
+      if (splash) {
+        splash.classList.add('vanish');
+        setTimeout(() => {
+          splash.style.display = 'none';
+        }, 750);
+      }
+    }
+    setTimeout(dismissSplash, 2100);
+
+    // --- RAIL PILL MOVEMENT WITH SPRING PHYSICS ---
+    function moveRailPill(pageId, animate = true) {
+      const items = Array.from(document.querySelectorAll('.rail__item'));
+      const activeEl = items.find(el => el.getAttribute('data-page') === pageId && el.offsetParent !== null);
+      const pill = document.querySelector('.rail__pill');
+      const railList = document.querySelector('.rail__list');
+      if (!activeEl || !pill || !railList) return;
+
+      const icon = activeEl.querySelector('.rail__icon') || activeEl;
+      let top = 0, left = 0;
+      for (let el = icon; el && el !== railList; el = el.offsetParent) {
+        top += el.offsetTop;
+        left += el.offsetLeft;
+      }
+
+      if (animate && window.gsap) {
+        gsap.to(pill, {
+          x: left,
+          y: top,
+          opacity: 1,
+          scale: 1,
+          duration: 0.5,
+          ease: 'back.out(1.6)',
+          overwrite: true
+        });
+      } else {
+        pill.style.transform = "translate(" + left + "px, " + top + "px)";
+        pill.style.opacity = '1';
+      }
+    }
+
+    // --- COLLAPSIBLE SIDEBAR RAIL ---
+    function toggleSidebar() {
+      const isOpen = document.documentElement.classList.toggle('rail-open');
+      const toggleBtn = document.getElementById('rail-toggle');
+      if (toggleBtn) {
+        toggleBtn.setAttribute('aria-expanded', String(isOpen));
+        const label = toggleBtn.querySelector('.rail__label');
+        if (label) {
+          label.textContent = isOpen ? 'Collapse sidebar' : 'Expand sidebar';
+        }
+      }
+      try {
+        localStorage.setItem('campus:rail', isOpen ? '1' : '0');
+      } catch (e) {}
+      setTimeout(() => moveRailPill(activePage, true), 360);
+    }
+
+    // --- NAVIGATION ENGINE & SECTION ANIMATIONS ---
+    let activePage = "overview";
+
+    function navigate(pageId, animate = true) {
+      activePage = pageId;
+
+      document.querySelectorAll('.view-pane').forEach(v => {
+        v.classList.remove('active');
+        v.style.display = 'none';
+      });
+
+      const target = document.getElementById('view-' + pageId);
+      if (target) {
+        target.classList.add('active');
+        target.style.display = '';
+      }
+
+      document.querySelectorAll('.rail__item').forEach(item => {
+        const isCur = item.getAttribute('data-page') === pageId;
+        item.classList.toggle('is-active', isCur);
+        if (isCur) item.setAttribute('aria-current', 'page');
+        else item.removeAttribute('aria-current');
+      });
+
+      moveRailPill(pageId, animate);
+
+      const titles = {
+        overview: { title: "Campus Desk", sub: "Here’s how your campus operations moved today." },
+        chat: { title: "AI Assistant", sub: "Grounded conversational campus dispatch & knowledge support." },
+        report: { title: "Report Incident", sub: "Submit facility disruptions for automated triage & routing." },
+        track: { title: "Track Resolution", sub: "Real-time 4-stage lifecycle milestones & technician audit trail." },
+        admin: { title: "Staff Admin Triage Desk", sub: "Incident management, priority overrides, and audit spreadsheets." },
+        about: { title: "About CampusDesk", sub: "Architecture disclosures, local storage safety, and emergency contacts." }
+      };
+
+      const info = titles[pageId] || titles.overview;
+
+      const titleEl = document.getElementById('topbarPageTitle');
+      const subEl = document.getElementById('topbarPageSub');
+
+      if (titleEl) {
+        titleEl.innerHTML = info.title.split(' ').map(w => '<span class="w">' + w + '</span>').join(' ');
+      }
+      if (subEl) {
+        subEl.textContent = info.sub;
+      }
+
+      if (animate && window.gsap) {
+        gsap.fromTo('.top__title .w', 
+          { yPercent: 70, opacity: 0 }, 
+          { yPercent: 0, opacity: 1, duration: 0.5, stagger: 0.05, ease: 'power3.out', clearProps: 'transform' }
+        );
+        if (subEl) {
+          gsap.fromTo(subEl, 
+            { opacity: 0, y: 6 }, 
+            { opacity: 1, y: 0, duration: 0.4, delay: 0.1, ease: 'power3.out', clearProps: 'transform' }
+          );
+        }
+
+        if (target) {
+          const cards = target.querySelectorAll('.card, .campus-card, .campus-chat-box');
+          if (cards.length > 0) {
+            gsap.fromTo(cards, 
+              { opacity: 0, y: 18, scale: 0.985 }, 
+              { opacity: 1, y: 0, scale: 1, duration: 0.55, stagger: 0.05, ease: 'power3.out', clearProps: 'transform' }
+            );
+          }
+        }
+      }
+
+      if (pageId === 'overview') updateOverviewFeed();
+      if (typeof updateMonthlyDiagram === "function") updateMonthlyDiagram(currentChartYear);
+      if (typeof updateTopTeams === "function") updateTopTeams(currentTopRange);
+      if (typeof updateCategoryMix === "function") updateCategoryMix(currentMixPeriod);
+      if (pageId === 'admin') filterAdminTable();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // --- PERSONA SWITCHER ---
+    let currentRole = "student";
+    function switchRole(role) {
+      currentRole = role;
+      const bStu = document.getElementById('btnStudentRole');
+      const bAdm = document.getElementById('btnAdminRole');
+      if (bStu) bStu.className = 'persona-btn ' + (role === 'student' ? 'active' : '');
+      if (bAdm) bAdm.className = 'persona-btn ' + (role === 'admin' ? 'active admin' : '');
+      showToast("Switched persona view to: " + (role === 'student' ? 'Student Requester' : 'Staff Admin / Triage Officer'));
+    }
+
+    // --- CHAT ENGINE ---
+    const FAQ_DATA = [
+      {
+        keys: ["library", "hours", "study", "open", "close", "books"],
+        answer: "The Central Library is open Mon-Fri 8:00 AM - 10:00 PM, and Sat-Sun 10:00 AM - 6:00 PM. The Level 1 Study Commons is open 24/7 (tap student ID card after 10 PM). Students can borrow up to 5 books for 14 days.",
+        chips: ["How to connect to Wi-Fi", "Shuttle bus schedule", "Report an issue"]
+      },
+      {
+        keys: ["wifi", "wi-fi", "internet", "network", "connect", "password"],
+        answer: "Connect to 'Campus-Secure-5G' using your Student ID and university portal password. Visitors can use 'Campus-Guest' for 4 hours via SMS verification. If connection drops, visit IT Desk in Tech Hub 102 (Ext 555-0199).",
+        chips: ["Library hours", "Projector remote", "Campus safety contacts"]
+      },
+      {
+        keys: ["shuttle", "bus", "transport", "schedule", "route"],
+        answer: "Route A (Central Quad <-> West Gate) departs every 15 mins (7:30 AM - 8:30 PM). Route B (Dorm Village <-> Science Block) runs every 20 mins. Night Owl shuttle runs hourly from 9 PM to midnight. Free with Student ID!",
+        chips: ["Library hours", "Campus safety contacts", "Report an issue"]
+      },
+      {
+        keys: ["projector", "remote", "classroom", "hdmi", "av"],
+        answer: "Lectern keys and projector remotes are kept at the Floor Warden's desk on each floor. If a projector lamp or audio system fails during lecture, submit an issue under 'Classroom/Projector' or call Ext 555-0150.",
+        chips: ["Report broken projector", "IT support hours", "Library hours"]
+      },
+      {
+        keys: ["emergency", "safety", "security", "fire", "police", "guard", "medical"],
+        answer: "For immediate safety threats, fire, medical emergencies, or security incidents, dial Campus Security 24/7 Dispatch directly at Ext 555-0911 or the Health Center at Ext 555-0112.",
+        chips: ["Report safety hazard", "Shuttle bus timings", "Library hours"]
+      }
+    ];
+
+    let messages = [
+      {
+        sender: "bot",
+        text: "Hello! I am your CampusDesk Assistant. How can I assist you with university life today? Ask about library study hours, campus Wi-Fi, classroom AV remotes, shuttle schedules, or emergency contacts.",
+        chips: ["Library opening hours & study rooms", "How to connect to campus Wi-Fi", "Shuttle bus schedule", "Emergency campus contacts"]
+      }
+    ];
+
+    function renderChatWindow() {
+      const area = document.getElementById('chatArea');
+      if (!area) return;
+      area.textContent = '';
+
+      messages.forEach(m => {
+        const row = document.createElement('div');
+        row.className = 'chat-msg-row ' + m.sender;
+
+        const avatar = document.createElement('div');
+        avatar.className = 'chat-user-avatar';
+        avatar.textContent = m.sender === 'user' ? 'YOU' : 'AI';
+
+        const content = document.createElement('div');
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-speech-bubble';
+        bubble.textContent = m.text;
+        content.appendChild(bubble);
+
+        if (m.chips && m.chips.length > 0) {
+          const chipsWrap = document.createElement('div');
+          chipsWrap.className = 'chat-suggestion-chips';
+          m.chips.forEach(c => {
+            const btn = document.createElement('button');
+            btn.className = 'chip-item';
+            btn.textContent = c;
+            btn.onclick = () => {
+              document.getElementById('chatTextInput').value = c;
+              sendChatMessage();
+            };
+            chipsWrap.appendChild(btn);
+          });
+          content.appendChild(chipsWrap);
+        }
+
+        row.appendChild(avatar);
+        row.appendChild(content);
+        area.appendChild(row);
+      });
+      area.scrollTop = area.scrollHeight;
+    }
+
+    function sendChatMessage() {
+      const input = document.getElementById('chatTextInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      messages.push({ sender: 'user', text });
+      input.value = '';
+      renderChatWindow();
+
+      setTimeout(() => {
+        const q = text.toLowerCase();
+        const found = FAQ_DATA.find(item => item.keys.some(k => q.includes(k)));
+        if (found) {
+          messages.push({ sender: 'bot', text: found.answer, chips: found.chips });
+        } else {
+          messages.push({
+            sender: 'bot',
+            text: "I couldn't locate an exact match for that question in the campus knowledge guide. If this is related to a facility maintenance problem, you can submit an official report.",
+            chips: ["Library hours & study rooms", "Wi-Fi connection guide", "File a maintenance report"]
+          });
+        }
+        renderChatWindow();
+      }, 300);
+    }
+
+    // --- ISSUE REPORTING LOGIC ---
+    function toggleSafetyWarning() {
+      const cat = document.getElementById('fCategory').value;
+      const warn = document.getElementById('safetyWarningBox');
+      if (warn) warn.style.display = (cat === 'Campus Safety') ? 'block' : 'none';
+    }
+
+    let newlyCreatedId = "";
+
+    function handleFormSubmission(e) {
+      e.preventDefault();
+      const studentName = document.getElementById('fStudent').value.trim();
+      const category = document.getElementById('fCategory').value;
+      const location = document.getElementById('fLocation').value.trim();
+      const title = document.getElementById('fTitle').value.trim();
+      const description = document.getElementById('fDesc').value.trim();
+
+      const combined = (title + " " + description).toLowerCase();
+      let priority = "Low";
+      if (category === "Campus Safety") priority = "High";
+      else if (["Electricity", "Wi-Fi/Internet", "Classroom/Projector", "Transportation"].includes(category)) priority = "Medium";
+
+      if (["exam", "entire building", "no power", "everyone", "flooding", "stuck"].some(k => combined.includes(k))) {
+        if (priority === "Low") priority = "Medium";
+        else if (priority === "Medium") priority = "High";
+      }
+
+      if (["fire", "smoke", "sparks", "spark", "shock", "exposed wire", "injury", "threat", "harassment", "assault", "gas", "emergency"].some(k => combined.includes(k))) {
+        priority = "Critical";
+      }
+
+      const deptMap = {
+        "Classroom/Projector": "Academic AV & Media Services",
+        "Wi-Fi/Internet": "Campus IT & Network Infrastructure",
+        "Washroom/Cleanliness": "Facilities & Janitorial Services",
+        "Fan/AC": "HVAC & Mechanical Maintenance",
+        "Electricity": "Electrical Maintenance Division",
+        "Transportation": "Campus Fleet & Logistics",
+        "Campus Safety": "Campus Safety & Security Office",
+        "Other": "General Operations"
+      };
+
+      const dept = deptMap[category] || "General Operations";
+      let action = "Standard maintenance ticket queued for department inspection.";
+      if (priority === "Critical") action = "Immediate alert triggered to on-duty response team; emergency dispatch initiated.";
+      else if (priority === "High") action = "Priority work order created; duty supervisor notified within 1 business hour.";
+
+      const now = new Date();
+      const dateCode = now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0');
+      const randLetters = Math.random().toString(36).substring(2,6).toUpperCase();
+      const id = "CAM-" + dateCode + "-" + randLetters;
+
+      const newRecord = {
+        id,
+        studentName,
+        category,
+        location,
+        title,
+        description,
+        priority,
+        suggestedDepartment: dept,
+        suggestedAction: action,
+        status: "Submitted",
+        createdAt: now.toISOString(),
+        history: [
+          { status: "Submitted", at: now.toISOString(), note: "Report filed by " + studentName + ". Assigned to " + dept + "." }
+        ]
+      };
+
+      const reports = getStorageReports();
+      reports.unshift(newRecord);
+      saveStorageReports(reports);
+
+      newlyCreatedId = id;
+
+      document.getElementById('formCard').style.display = 'none';
+      document.getElementById('confirmCard').style.display = 'block';
+      document.getElementById('cId').textContent = id;
+      document.getElementById('cPriorityBadge').className = 'badge badge-' + priority.toLowerCase();
+      document.getElementById('cPriorityBadge').textContent = priority;
+      document.getElementById('cDept').textContent = dept;
+      document.getElementById('cAction').textContent = action;
+
+      refreshData();
+      showToast("Incident " + id + " submitted successfully!");
+    }
+
+    function resetFormCard() {
+      document.getElementById('fStudent').value = '';
+      document.getElementById('fLocation').value = '';
+      document.getElementById('fTitle').value = '';
+      document.getElementById('fDesc').value = '';
+      document.getElementById('formCard').style.display = 'block';
+      document.getElementById('confirmCard').style.display = 'none';
+      toggleSafetyWarning();
+    }
+
+    function trackFromConfirmation() {
+      navigate('track');
+      setTrackField(newlyCreatedId);
+      executeTrackSearch();
+    }
+
+    // --- TRACKING LOOKUP ---
+    function setTrackField(id) {
+      const el = document.getElementById('tInput');
+      if (el) el.value = id;
+    }
+
+    function executeQuickTrack() {
+      const val = document.getElementById('quickSearchTrack')?.value.trim();
+      if (!val) return;
+      navigate('track');
+      setTrackField(val);
+      executeTrackSearch();
+    }
+
+    function executeQuickSearchTrack() {
+      const val = document.getElementById('topGlobalSearch')?.value.trim();
+      if (!val) return;
+      navigate('track');
+      setTrackField(val);
+      executeTrackSearch();
+    }
+
+    function executeTrackSearch() {
+      const q = document.getElementById('tInput').value.trim().toUpperCase();
+      const box = document.getElementById('tResultBox');
+      box.style.display = 'block';
+      box.textContent = '';
+
+      if (!q) {
+        const emptyPrompt = document.createElement('div');
+        emptyPrompt.className = 'card';
+        emptyPrompt.style.textAlign = 'center';
+        emptyPrompt.style.color = 'var(--ink-3)';
+        emptyPrompt.textContent = 'Please enter a tracking reference ID.';
+        box.appendChild(emptyPrompt);
+        return;
+      }
+
+      const reports = getStorageReports();
+      const r = reports.find(item => item.id.toUpperCase() === q);
+
+      if (!r) {
+        const notFoundCard = document.createElement('div');
+        notFoundCard.className = 'card';
+        notFoundCard.style.textAlign = 'center';
+        notFoundCard.style.padding = '36px 20px';
+
+        const icon = document.createElement('div');
+        icon.style.fontSize = '32px';
+        icon.style.marginBottom = '10px';
+        icon.textContent = '🔍';
+
+        const h3 = document.createElement('h3');
+        h3.style.fontFamily = 'var(--font-display)';
+        h3.style.fontSize = '18px';
+        h3.style.fontWeight = '700';
+        h3.style.marginBottom = '6px';
+        h3.textContent = 'No Report Found';
+
+        const p = document.createElement('p');
+        p.style.fontSize = 'var(--fs-sm)';
+        p.style.color = 'var(--ink-3)';
+        p.style.marginBottom = '16px';
+        p.textContent = 'We could not find any record matching "' + q + '".';
+
+        const btn = document.createElement('button');
+        btn.className = 'btn-action btn-ghost-dark';
+        btn.textContent = 'File a New Report';
+        btn.onclick = () => navigate('report');
+
+        notFoundCard.appendChild(icon);
+        notFoundCard.appendChild(h3);
+        notFoundCard.appendChild(p);
+        notFoundCard.appendChild(btn);
+        box.appendChild(notFoundCard);
+        return;
+      }
+
+      const card = document.createElement('div');
+      card.className = 'card';
+
+      // Header row
+      const headRow = document.createElement('div');
+      headRow.style.cssText = 'display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:18px; flex-wrap:wrap; gap:10px;';
+
+      const titleCol = document.createElement('div');
+      const idSpan = document.createElement('span');
+      idSpan.style.cssText = 'font-family:var(--font-mono); font-weight:800; font-size:18px; color:var(--c-tangerine);';
+      idSpan.textContent = r.id;
+
+      const titleH3 = document.createElement('h3');
+      titleH3.style.cssText = 'font-family:var(--font-display); font-size:20px; font-weight:700; margin-top:4px;';
+      titleH3.textContent = r.title;
+      titleCol.appendChild(idSpan);
+      titleCol.appendChild(titleH3);
+
+      const badgesCol = document.createElement('div');
+      badgesCol.style.cssText = 'display:flex; gap:8px;';
+      const statusBadge = document.createElement('span');
+      statusBadge.className = 'badge badge-status-' + r.status.toLowerCase().replace(' ', '-');
+      statusBadge.textContent = r.status;
+      const prioBadge = document.createElement('span');
+      prioBadge.className = 'badge badge-' + r.priority.toLowerCase();
+      prioBadge.textContent = r.priority;
+      badgesCol.appendChild(statusBadge);
+      badgesCol.appendChild(prioBadge);
+
+      headRow.appendChild(titleCol);
+      headRow.appendChild(badgesCol);
+      card.appendChild(headRow);
+
+      // Meta grid
+      const metaGrid = document.createElement('div');
+      metaGrid.style.cssText = 'display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px; background:var(--surface-2); padding:14px; border-radius:var(--r-sm); font-size:12.5px; margin-bottom:20px; border:1px solid var(--line);';
+
+      const locDiv = document.createElement('div');
+      const locStrong = document.createElement('strong');
+      locStrong.style.color = 'var(--ink-3)';
+      locStrong.textContent = 'Location: ';
+      locDiv.appendChild(locStrong);
+      locDiv.appendChild(document.createTextNode(r.location));
+
+      const deptDiv = document.createElement('div');
+      const deptStrong = document.createElement('strong');
+      deptStrong.style.color = 'var(--ink-3)';
+      deptStrong.textContent = 'Department: ';
+      deptDiv.appendChild(deptStrong);
+      deptDiv.appendChild(document.createTextNode(r.suggestedDepartment));
+
+      const dateDiv = document.createElement('div');
+      const dateStrong = document.createElement('strong');
+      dateStrong.style.color = 'var(--ink-3)';
+      dateStrong.textContent = 'Filed Date: ';
+      dateDiv.appendChild(dateStrong);
+      dateDiv.appendChild(document.createTextNode(new Date(r.createdAt).toLocaleDateString()));
+
+      metaGrid.appendChild(locDiv);
+      metaGrid.appendChild(deptDiv);
+      metaGrid.appendChild(dateDiv);
+      card.appendChild(metaGrid);
+
+      // Description
+      const descP = document.createElement('p');
+      descP.style.cssText = 'font-size:var(--fs-sm); color:var(--ink-2); line-height:1.6; margin-bottom:20px;';
+      descP.textContent = r.description;
+      card.appendChild(descP);
+
+      // Timeline Title
+      const timeTitle = document.createElement('h4');
+      timeTitle.style.cssText = 'font-family:var(--font-display); font-size:16px; font-weight:700; border-top:1px solid var(--line); padding-top:18px; margin-bottom:14px;';
+      timeTitle.textContent = 'Resolution Lifecycle Timeline';
+      card.appendChild(timeTitle);
+
+      // Timeline Stages
+      const stages = ["Submitted", "Under Review", "In Progress", "Resolved"];
+      const currentIndex = stages.indexOf(r.status);
+      const stagesWrap = document.createElement('div');
+      stagesWrap.style.cssText = 'margin: 20px 0; display:flex; flex-direction:column; gap:16px;';
+
+      stages.forEach((st, idx) => {
+        const isDone = idx <= currentIndex;
+        const isCurrent = idx === currentIndex;
+        const circleBg = isCurrent ? 'var(--c-tangerine)' : (isDone ? 'var(--c-teal)' : 'var(--surface-2)');
+        const circleColor = (isCurrent || isDone) ? '#ffffff' : 'var(--ink-3)';
+
+        const stepRow = document.createElement('div');
+        stepRow.style.cssText = 'display:flex; gap:14px; align-items:flex-start;';
+
+        const circle = document.createElement('div');
+        circle.style.cssText = 'width:28px; height:28px; border-radius:50%; background:' + circleBg + '; color:' + circleColor + '; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; flex-shrink:0;';
+        circle.textContent = (idx + 1).toString();
+
+        const stepTextCol = document.createElement('div');
+        const stepName = document.createElement('div');
+        stepName.style.cssText = 'font-weight:700; font-size:14.5px; color:' + (isCurrent ? 'var(--c-tangerine)' : 'var(--ink)') + ';';
+        stepName.textContent = st;
+        stepTextCol.appendChild(stepName);
+
+        if (isCurrent) {
+          const activeSub = document.createElement('div');
+          activeSub.style.cssText = 'font-size:12px; color:var(--ink-3);';
+          activeSub.textContent = 'Current Active Milestone';
+          stepTextCol.appendChild(activeSub);
+        }
+
+        stepRow.appendChild(circle);
+        stepRow.appendChild(stepTextCol);
+        stagesWrap.appendChild(stepRow);
+      });
+
+      card.appendChild(stagesWrap);
+
+      if (r.status !== 'Resolved') {
+        const resolveTrackBtn = document.createElement('button');
+        resolveTrackBtn.className = 'btn-action btn-primary-glow';
+        resolveTrackBtn.style.cssText = 'margin-top:14px; width:100%; justify-content:center;';
+        resolveTrackBtn.textContent = 'Mark This Incident As Resolved';
+        resolveTrackBtn.onclick = () => {
+          quickResolveIncident(r.id);
+          executeTrackSearch();
+        };
+        card.appendChild(resolveTrackBtn);
+      }
+
+      box.appendChild(card);
+    }
+
+        function quickResolveIncident(id) {
+      const reports = getStorageReports();
+      const r = reports.find(item => item.id === id);
+      if (!r) return;
+      r.status = 'Resolved';
+      if (!r.history) r.history = [];
+      r.history.push({
+        status: 'Resolved',
+        at: new Date().toISOString(),
+        note: 'Marked as Resolved directly from Active Incident Feed.'
+      });
+      saveStorageReports(reports);
+      refreshData(true);
+      showToast("Incident " + id + " marked as Resolved!");
+    }
+
+    // --- OVERVIEW RECENT TABLE ---
+    function updateOverviewFeed() {
+      const reports = getStorageReports();
+      const tbody = document.getElementById('overviewRecentTable');
+      if (!tbody) return;
+      tbody.textContent = '';
+
+      if (reports.length === 0) {
+        const trEmpty = document.createElement('tr');
+        const tdEmpty = document.createElement('td');
+        tdEmpty.colSpan = 7;
+        tdEmpty.style.cssText = 'text-align:center; padding:32px; color:var(--ink-3);';
+        tdEmpty.textContent = 'No incident reports logged yet. Submit your first report via "Report Issue".';
+        trEmpty.appendChild(tdEmpty);
+        tbody.appendChild(trEmpty);
+        return;
+      }
+
+      reports.slice(0, 5).forEach(r => {
+        const tr = document.createElement('tr');
+
+        const tdId = document.createElement('td');
+        tdId.style.cssText = 'font-family:var(--font-mono); font-weight:700; color:var(--c-tangerine);';
+        tdId.textContent = r.id;
+
+        const tdTitle = document.createElement('td');
+        const strongTitle = document.createElement('strong');
+        strongTitle.textContent = r.title;
+        tdTitle.appendChild(strongTitle);
+
+        const tdLoc = document.createElement('td');
+        tdLoc.textContent = r.location;
+
+        const tdPrio = document.createElement('td');
+        const prioBadge = document.createElement('span');
+        prioBadge.className = 'badge badge-' + r.priority.toLowerCase();
+        prioBadge.textContent = r.priority;
+        tdPrio.appendChild(prioBadge);
+
+        const tdDept = document.createElement('td');
+        tdDept.textContent = r.suggestedDepartment;
+
+        const tdStatus = document.createElement('td');
+        const statusBadge = document.createElement('span');
+        statusBadge.className = 'badge badge-status-' + r.status.toLowerCase().replace(' ', '-');
+        statusBadge.textContent = r.status;
+        tdStatus.appendChild(statusBadge);
+
+        const tdAction = document.createElement('td');
+        const actionWrap = document.createElement('div');
+        actionWrap.style.cssText = 'display:flex; gap:6px; align-items:center;';
+
+        const trackBtn = document.createElement('button');
+        trackBtn.className = 'quick-pill-btn';
+        trackBtn.textContent = 'Track';
+        trackBtn.onclick = () => {
+          navigate('track');
+          setTrackField(r.id);
+          executeTrackSearch();
+        };
+        actionWrap.appendChild(trackBtn);
+
+        if (r.status !== 'Resolved') {
+          const resolveBtn = document.createElement('button');
+          resolveBtn.className = 'quick-pill-btn';
+          resolveBtn.style.cssText = 'color:var(--c-teal); border-color:var(--c-teal); font-weight:700;';
+          resolveBtn.textContent = 'Resolve';
+          resolveBtn.title = 'Quick-resolve this incident now';
+          resolveBtn.onclick = () => quickResolveIncident(r.id);
+          actionWrap.appendChild(resolveBtn);
+        }
+        tdAction.appendChild(actionWrap);
+
+        tr.appendChild(tdId);
+        tr.appendChild(tdTitle);
+        tr.appendChild(tdLoc);
+        tr.appendChild(tdPrio);
+        tr.appendChild(tdDept);
+        tr.appendChild(tdStatus);
+        tr.appendChild(tdAction);
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    // --- ADMIN TABLE & MODAL OVERRIDES ---
+    let currentAdminEditId = null;
+
+    function filterAdminTable() {
+      const q = (document.getElementById('adminSearch')?.value || '').toLowerCase();
+      const stFilter = document.getElementById('adminStatusSelect')?.value || 'ALL';
+      const catFilter = document.getElementById('adminCategorySelect')?.value || 'ALL';
+      const prioFilter = document.getElementById('adminPrioritySelect')?.value || 'ALL';
+
+      const reports = getStorageReports();
+      const filtered = reports.filter(r => {
+        if (q && !(r.id.toLowerCase().includes(q) || r.title.toLowerCase().includes(q) || r.studentName.toLowerCase().includes(q) || r.location.toLowerCase().includes(q))) return false;
+        if (stFilter !== 'ALL' && r.status !== stFilter) return false;
+        if (catFilter !== 'ALL' && r.category !== catFilter) return false;
+        if (prioFilter !== 'ALL' && r.priority !== prioFilter) return false;
+        return true;
+      });
+
+      const tbody = document.getElementById('adminTableBody');
+      if (!tbody) return;
+      tbody.textContent = '';
+
+      if (filtered.length === 0) {
+        const trEmpty = document.createElement('tr');
+        const tdEmpty = document.createElement('td');
+        tdEmpty.colSpan = 7;
+        tdEmpty.style.cssText = 'text-align:center; padding:28px; color:var(--ink-3);';
+        tdEmpty.textContent = reports.length === 0 
+          ? 'No incidents received yet. Newly submitted reports will appear here in real time.' 
+          : 'No incidents match active filter criteria.';
+        trEmpty.appendChild(tdEmpty);
+        tbody.appendChild(trEmpty);
+        return;
+      }
+
+      filtered.forEach(r => {
+        const tr = document.createElement('tr');
+
+        const tdId = document.createElement('td');
+        tdId.style.cssText = 'font-family:var(--font-mono); font-weight:700; color:var(--c-tangerine);';
+        tdId.textContent = r.id;
+
+        const tdName = document.createElement('td');
+        const strongName = document.createElement('strong');
+        strongName.textContent = r.studentName;
+        tdName.appendChild(strongName);
+
+        const tdDetails = document.createElement('td');
+        const titleDiv = document.createElement('div');
+        const strongTitle = document.createElement('strong');
+        strongTitle.textContent = r.title;
+        titleDiv.appendChild(strongTitle);
+        const locDiv = document.createElement('div');
+        locDiv.style.cssText = 'font-size:11px; color:var(--ink-3);';
+        locDiv.textContent = r.location;
+        tdDetails.appendChild(titleDiv);
+        tdDetails.appendChild(locDiv);
+
+        const tdPrio = document.createElement('td');
+        const prioBadge = document.createElement('span');
+        prioBadge.className = 'badge badge-' + r.priority.toLowerCase();
+        prioBadge.textContent = r.priority;
+        tdPrio.appendChild(prioBadge);
+
+        const tdDept = document.createElement('td');
+        tdDept.textContent = r.suggestedDepartment;
+
+        const tdStatus = document.createElement('td');
+        const statusBadge = document.createElement('span');
+        statusBadge.className = 'badge badge-status-' + r.status.toLowerCase().replace(' ', '-');
+        statusBadge.textContent = r.status;
+        tdStatus.appendChild(statusBadge);
+
+        const tdAction = document.createElement('td');
+        const manageBtn = document.createElement('button');
+        manageBtn.className = 'quick-pill-btn';
+        manageBtn.textContent = 'Manage';
+        manageBtn.onclick = () => openAdminModal(r.id);
+        tdAction.appendChild(manageBtn);
+
+        tr.appendChild(tdId);
+        tr.appendChild(tdName);
+        tr.appendChild(tdDetails);
+        tr.appendChild(tdPrio);
+        tr.appendChild(tdDept);
+        tr.appendChild(tdStatus);
+        tr.appendChild(tdAction);
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function openAdminModal(id) {
+      currentAdminEditId = id;
+      const reports = getStorageReports();
+      const r = reports.find(item => item.id === id);
+      if (!r) return;
+
+      const inject = document.getElementById('modalFormInject');
+      inject.textContent = '';
+
+      const headerDiv = document.createElement('div');
+      headerDiv.style.marginBottom = '16px';
+      const idDiv = document.createElement('div');
+      idDiv.style.cssText = 'font-family:var(--font-mono); font-size:13px; color:var(--c-tangerine); font-weight:800;';
+      idDiv.textContent = r.id;
+      const titleDiv = document.createElement('h4');
+      titleDiv.style.cssText = 'font-family:var(--font-display); font-size:16px; font-weight:700; margin-top:2px;';
+      titleDiv.textContent = r.title;
+      headerDiv.appendChild(idDiv);
+      headerDiv.appendChild(titleDiv);
+      inject.appendChild(headerDiv);
+
+      // Status Row
+      const statusRow = document.createElement('div');
+      statusRow.className = 'form-row';
+      const statusLabel = document.createElement('label');
+      statusLabel.className = 'form-label';
+      statusLabel.textContent = 'Incident Lifecycle Status';
+      const statusSelect = document.createElement('select');
+      statusSelect.id = 'mStatus';
+      statusSelect.className = 'form-control';
+      ["Submitted", "Under Review", "In Progress", "Resolved"].forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s;
+        opt.textContent = s;
+        if (r.status === s) opt.selected = true;
+        statusSelect.appendChild(opt);
+      });
+      statusRow.appendChild(statusLabel);
+      statusRow.appendChild(statusSelect);
+      inject.appendChild(statusRow);
+
+      // Priority Row
+      const prioRow = document.createElement('div');
+      prioRow.className = 'form-row';
+      const prioLabel = document.createElement('label');
+      prioLabel.className = 'form-label';
+      prioLabel.textContent = 'Priority Override';
+      const prioSelect = document.createElement('select');
+      prioSelect.id = 'mPriority';
+      prioSelect.className = 'form-control';
+      ["Low", "Medium", "High", "Critical"].forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p;
+        opt.textContent = p;
+        if (r.priority === p) opt.selected = true;
+        prioSelect.appendChild(opt);
+      });
+      prioRow.appendChild(prioLabel);
+      prioRow.appendChild(prioSelect);
+      inject.appendChild(prioRow);
+
+      // Department Row
+      const deptRow = document.createElement('div');
+      deptRow.className = 'form-row';
+      const deptLabel = document.createElement('label');
+      deptLabel.className = 'form-label';
+      deptLabel.textContent = 'Assigned Department';
+      const deptInput = document.createElement('input');
+      deptInput.id = 'mDept';
+      deptInput.type = 'text';
+      deptInput.className = 'form-control';
+      deptInput.value = r.suggestedDepartment;
+      deptRow.appendChild(deptLabel);
+      deptRow.appendChild(deptInput);
+      inject.appendChild(deptRow);
+
+      // Audit Note Row
+      const noteRow = document.createElement('div');
+      noteRow.className = 'form-row';
+      const noteLabel = document.createElement('label');
+      noteLabel.className = 'form-label';
+      noteLabel.textContent = 'Technician Audit Note';
+      const noteInput = document.createElement('input');
+      noteInput.id = 'mNote';
+      noteInput.type = 'text';
+      noteInput.className = 'form-control';
+      noteInput.placeholder = 'e.g. Dispatched technician; replaced blown projector lamp.';
+      noteRow.appendChild(noteLabel);
+      noteRow.appendChild(noteInput);
+      inject.appendChild(noteRow);
+
+      // Buttons Row
+      const btnRow = document.createElement('div');
+      btnRow.style.cssText = 'display:flex; justify-content:flex-end; gap:10px; margin-top:24px;';
+      const cancelBtn = document.createElement('button');
+      cancelBtn.className = 'btn-action btn-ghost-dark';
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.onclick = closeEditModal;
+      const saveBtn = document.createElement('button');
+      saveBtn.className = 'btn-action btn-primary-glow';
+      saveBtn.textContent = 'Save Changes';
+      saveBtn.onclick = saveAdminChanges;
+      btnRow.appendChild(cancelBtn);
+      btnRow.appendChild(saveBtn);
+      inject.appendChild(btnRow);
+
+      document.getElementById('adminEditModal').classList.add('open');
+    }
+
+    function closeEditModal() {
+      document.getElementById('adminEditModal').classList.remove('open');
+    }
+
+    function saveAdminChanges() {
+      const reports = getStorageReports();
+      const r = reports.find(item => item.id === currentAdminEditId);
+      if (!r) return;
+
+      r.status = document.getElementById('mStatus').value;
+      r.priority = document.getElementById('mPriority').value;
+      r.suggestedDepartment = document.getElementById('mDept').value.trim();
+      const note = document.getElementById('mNote').value.trim();
+
+      if (note) {
+        r.history.push({ status: r.status, at: new Date().toISOString(), note });
+      }
+
+      saveStorageReports(reports);
+      closeEditModal();
+      refreshData();
+      showToast("Incident " + r.id + " updated to " + r.status + ".");
+    }
+
+    
+    // --- MONTHLY REPORTS CALCULATION DIAGRAM ---
+    let currentChartYear = 2026;
+
+    function setChartYear(year) {
+      currentChartYear = year;
+      document.querySelectorAll('#month .seg button').forEach(b => b.classList.remove('is-active'));
+      const activeBtn = document.getElementById('btnYear' + year);
+      if (activeBtn) activeBtn.classList.add('is-active');
+      updateMonthlyDiagram(year);
+      showToast("Displaying monthly report calculation for " + year + ".");
+    }
+
+    function updateMonthlyDiagram(year = currentChartYear) {
+      const container = document.getElementById('month-chart');
+      if (!container) return;
+
+      const reports = getStorageReports();
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const currentMonthIndex = new Date().getMonth();
+      const currentYearNow = new Date().getFullYear();
+
+      // Dynamically calculate submitted vs solved for each of the 12 months
+      const monthlyData = monthNames.map((name, mIdx) => {
+        let solved = 0;
+        let submitted = 0;
+
+        reports.forEach(r => {
+          if (!r.createdAt) return;
+          const d = new Date(r.createdAt);
+          if (d.getFullYear() === year && d.getMonth() === mIdx) {
+            if (r.status === 'Resolved') {
+              solved++;
+            } else {
+              submitted++;
+            }
+          }
+        });
+
+        return {
+          month: name,
+          mIdx,
+          solved,
+          submitted,
+          total: solved + submitted
+        };
+      });
+
+      // Calculate dynamic scale for Y-axis
+      const maxTotal = Math.max(...monthlyData.map(d => d.total), 0);
+      let yMax = 4;
+      if (maxTotal > 4 && maxTotal <= 8) yMax = 8;
+      else if (maxTotal > 8 && maxTotal <= 16) yMax = 16;
+      else if (maxTotal > 16 && maxTotal <= 40) yMax = 40;
+      else if (maxTotal > 40 && maxTotal <= 100) yMax = 100;
+      else if (maxTotal > 100) yMax = Math.ceil(maxTotal / 50) * 50;
+
+      // Panoramic chart geometry: viewBox 0 0 1000 270
+      const baselineY = 220;
+      const chartHeight = 190;
+      const topY = baselineY - chartHeight; // 30
+
+      const yTicks = [
+        { val: 0, y: baselineY },
+        { val: Math.round(yMax * 0.25), y: baselineY - chartHeight * 0.25 },
+        { val: Math.round(yMax * 0.5), y: baselineY - chartHeight * 0.5 },
+        { val: Math.round(yMax * 0.75), y: baselineY - chartHeight * 0.75 },
+        { val: yMax, y: topY }
+      ];
+
+      function formatTick(num) {
+        if (num >= 1000) return (num / 1000).toFixed(num % 1000 === 0 ? 0 : 1) + 'K';
+        return num.toString();
+      }
+
+      const colWidth = 36;
+      let colsSvg = '';
+      let xLabelsSvg = '';
+
+      monthlyData.forEach((d, i) => {
+        // 12 months distributed from x = 70 to x = 950
+        const xCenter = 70 + i * 80;
+        const xLeft = xCenter - colWidth / 2;
+        const xRight = xCenter + colWidth / 2;
+
+        let colPaths = '';
+        if (d.total > 0) {
+          const solvedHeight = (d.solved / yMax) * chartHeight;
+          const submittedHeight = (d.submitted / yMax) * chartHeight;
+          const totalHeight = solvedHeight + submittedHeight;
+
+          const yTop = baselineY - totalHeight;
+          const ySplit = baselineY - solvedHeight;
+
+          // Upper segment (submitted/in-triage: hatched pattern)
+          if (d.submitted > 0) {
+            const topRadius = 6;
+            const subY1 = yTop;
+            const subY2 = ySplit;
+            colPaths += '<path class="cols__seg" fill="url(#hatch-t)" d="M' + xLeft + ',' + subY2 + ' V' + (subY1 + topRadius) + ' Q' + xLeft + ',' + subY1 + ' ' + (xLeft + topRadius) + ',' + subY1 + ' H' + (xRight - topRadius) + ' Q' + xRight + ',' + subY1 + ' ' + xRight + ',' + (subY1 + topRadius) + ' V' + subY2 + ' Z"></path>';
+          }
+
+          // Lower segment (solved: solid color)
+          if (d.solved > 0) {
+            const solY1 = ySplit;
+            const solY2 = baselineY;
+            if (d.submitted === 0) {
+              const topRadius = 6;
+              colPaths += '<path class="cols__seg" fill="var(--c-tangerine)" d="M' + xLeft + ',' + solY2 + ' V' + (solY1 + topRadius) + ' Q' + xLeft + ',' + solY1 + ' ' + (xLeft + topRadius) + ',' + solY1 + ' H' + (xRight - topRadius) + ' Q' + xRight + ',' + solY1 + ' ' + xRight + ',' + (solY1 + topRadius) + ' V' + solY2 + ' Z"></path>';
+            } else {
+              colPaths += '<path class="cols__seg" fill="var(--c-tangerine)" d="M' + xLeft + ',' + solY2 + ' V' + solY1 + ' H' + xRight + ' V' + solY2 + ' Z"></path>';
+            }
+          }
+        } else {
+          // Subtle baseline marker for empty columns
+          colPaths += '<rect x="' + xLeft + '" y="' + (baselineY - 3) + '" width="' + colWidth + '" height="3" rx="1.5" fill="var(--line-strong)" opacity="0.4"></rect>';
+        }
+
+        const isCurrentMonth = (year === currentYearNow && i === currentMonthIndex);
+        colsSvg += '<g class="col ' + (isCurrentMonth ? 'is-on' : '') + '" data-month-index="' + i + '" data-month="' + d.month + '" data-solved="' + d.solved + '" data-submitted="' + d.submitted + '" data-total="' + d.total + '" data-x="' + xCenter + '" style="cursor: pointer;">'
+          + '<rect x="' + (xLeft - 14) + '" y="' + topY + '" width="' + (colWidth + 28) + '" height="' + (chartHeight + 20) + '" fill="transparent"></rect>'
+          + colPaths
+          + '</g>';
+
+        xLabelsSvg += '<text class="cols__axis ' + (isCurrentMonth ? 'is-on' : '') + '" id="colAxis_' + i + '" text-anchor="middle" x="' + xCenter + '" y="252">' + d.month + '</text>';
+      });
+
+      let gridSvg = '';
+      yTicks.forEach(tick => {
+        gridSvg += '<line class="cols__grid" x1="40" x2="980" y1="' + tick.y + '" y2="' + tick.y + '"></line>';
+        gridSvg += '<text class="cols__axis" text-anchor="end" x="32" y="' + (tick.y + 4) + '">' + formatTick(tick.val) + '</text>';
+      });
+
+      container.innerHTML = '<svg viewBox="0 0 1000 270" aria-hidden="true" preserveAspectRatio="none">'
+        + '<defs>'
+        + '<pattern id="hatch-t" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
+        + '<rect width="6" height="6" fill="var(--c-tangerine-soft)"></rect>'
+        + '<rect width="2" height="6" fill="var(--c-tangerine)" opacity=".8"></rect>'
+        + '</pattern>'
+        + '</defs>'
+        + '<g>' + gridSvg + '</g>'
+        + '<g>' + colsSvg + '</g>'
+        + '<g>' + xLabelsSvg + '</g>'
+        + '</svg>'
+        + '<div class="cols__tip" id="colsTooltip" aria-hidden="true" style="opacity: 0; pointer-events: none; transition: opacity 0.15s, transform 0.15s;">'
+        + '<strong id="colsTipTitle">Month · Total: 0</strong>'
+        + '<div class="row"><span><i class="key key--solid"></i>Solved</span><span id="colsTipSolved">0</span></div>'
+        + '<div class="row"><span><i class="key key--hatch"></i>Submitted</span><span id="colsTipSubmitted">0</span></div>'
+        + '</div>';
+
+      const tip = document.getElementById('colsTooltip');
+      const cols = container.querySelectorAll('.col');
+      cols.forEach(col => {
+        col.addEventListener('mouseenter', () => {
+          cols.forEach(c => c.classList.remove('is-on'));
+          container.querySelectorAll('.cols__axis').forEach(a => a.classList.remove('is-on'));
+          col.classList.add('is-on');
+
+          const idx = col.getAttribute('data-month-index');
+          const axisEl = document.getElementById('colAxis_' + idx);
+          if (axisEl) axisEl.classList.add('is-on');
+
+          const month = col.getAttribute('data-month');
+          const solved = col.getAttribute('data-solved');
+          const submitted = col.getAttribute('data-submitted');
+          const total = col.getAttribute('data-total');
+          const xCenter = parseFloat(col.getAttribute('data-x'));
+
+          document.getElementById('colsTipTitle').textContent = month + ' ' + year + ' · Total: ' + total;
+          document.getElementById('colsTipSolved').textContent = solved;
+          document.getElementById('colsTipSubmitted').textContent = submitted;
+
+          const containerRect = container.getBoundingClientRect();
+          const scale = containerRect.width / 1000;
+          const tipX = Math.max(10, Math.min(containerRect.width - 150, (xCenter * scale) - 60));
+
+          tip.style.transform = 'translate(' + tipX + 'px, 15px)';
+          tip.style.opacity = '1';
+        });
+
+        col.addEventListener('mouseleave', () => {
+          col.classList.remove('is-on');
+          const idx = col.getAttribute('data-month-index');
+          const isCur = (year === currentYearNow && parseInt(idx) === currentMonthIndex);
+          const axisEl = document.getElementById('colAxis_' + idx);
+          if (axisEl && !isCur) axisEl.classList.remove('is-on');
+          tip.style.opacity = '0';
+        });
+      });
+    }
+
+    // --- DYNAMIC TOP RESPONSE TEAMS & CATEGORY MIX ENGINE ---
+    let currentTopRange = 'week';
+    let currentMixPeriod = 'month';
+
+    function setTopRange(range) {
+      currentTopRange = range;
+      document.querySelectorAll('#top-contacts .seg button').forEach(b => b.classList.remove('is-active'));
+      const btn = document.getElementById('btnTop' + (range === 'week' ? 'Week' : 'Month'));
+      if (btn) btn.classList.add('is-active');
+      updateTopTeams(range);
+      showToast("Top response teams showing " + range + " volume.");
+    }
+
+    function updateTopTeams(range = currentTopRange) {
+      const container = document.getElementById('people');
+      if (!container) return;
+
+      const reports = getStorageReports();
+      const now = Date.now();
+      const cutoff = range === 'week' ? (now - 7 * 86400000) : (now - 30 * 86400000);
+
+      const filteredReports = reports.filter(r => {
+        if (!r.createdAt) return true;
+        return new Date(r.createdAt).getTime() >= cutoff;
+      });
+
+      const teams = [
+        { code: 'FM', name: 'Facilities & Janitorial', mail: 'facilities@campusdesk.edu', count: 0 },
+        { code: 'IT', name: 'Network & IT Ops', mail: 'it-help@campusdesk.edu', count: 0 },
+        { code: 'AV', name: 'Academic Media Services', mail: 'av@campusdesk.edu', count: 0 },
+        { code: 'CS', name: 'Campus Safety Dispatch', mail: 'security@campusdesk.edu', count: 0 },
+        { code: 'EM', name: 'Electrical Maintenance', mail: 'electric@campusdesk.edu', count: 0 }
+      ];
+
+      filteredReports.forEach(r => {
+        const cat = (r.category || '').toLowerCase();
+        const dept = (r.suggestedDepartment || '').toLowerCase();
+
+        if (cat.includes('washroom') || cat.includes('clean') || dept.includes('facilities') || cat.includes('other')) {
+          teams[0].count++;
+        } else if (cat.includes('wi-fi') || cat.includes('internet') || dept.includes('it') || dept.includes('network')) {
+          teams[1].count++;
+        } else if (cat.includes('classroom') || cat.includes('projector') || dept.includes('av') || dept.includes('media')) {
+          teams[2].count++;
+        } else if (cat.includes('safety') || cat.includes('security') || dept.includes('safety') || cat.includes('transportation')) {
+          teams[3].count++;
+        } else if (cat.includes('electr') || cat.includes('fan') || cat.includes('ac') || dept.includes('electrical')) {
+          teams[4].count++;
+        } else {
+          teams[0].count++;
+        }
+      });
+
+      const totalCount = filteredReports.length;
+      const maxCount = Math.max(...teams.map(t => t.count), 1);
+
+      container.innerHTML = '';
+      teams.forEach((t, idx) => {
+        const pct = totalCount > 0 ? Math.round((t.count / totalCount) * 100) : 0;
+        const barScale = totalCount > 0 ? (t.count / maxCount).toFixed(2) : '0';
+
+        const li = document.createElement('li');
+        li.className = 'person';
+        li.innerHTML = '<span class="person__av av--t' + (idx % 3) + '" aria-hidden="true">' + t.code + '</span>'
+          + '<div class="person__who">'
+          + '<span class="person__name">' + t.name + '<span class="person__mail">' + t.mail + '</span></span>'
+          + '<span class="person__bar" aria-hidden="true"><i style="--s: ' + barScale + ';"></i></span>'
+          + '</div>'
+          + '<span class="person__num">' + t.count + '<small>' + pct + '%</small></span>';
+        container.appendChild(li);
+      });
+    }
+
+    function setMixPeriod(period) {
+      currentMixPeriod = period;
+      document.querySelectorAll('#mix .seg button').forEach(b => b.classList.remove('is-active'));
+      const btn = document.getElementById('btnMix' + (period === 'month' ? 'Month' : 'Last'));
+      if (btn) btn.classList.add('is-active');
+      updateCategoryMix(period);
+      showToast("Category mix period updated: " + period + ".");
+    }
+
+    function updateCategoryMix(period = currentMixPeriod) {
+      const reports = getStorageReports();
+      const total = reports.length;
+
+      let facilities = 0;
+      let it = 0;
+      let safetyAv = 0;
+
+      reports.forEach(r => {
+        const cat = (r.category || '').toLowerCase();
+        if (cat.includes('washroom') || cat.includes('clean') || cat.includes('facility') || cat.includes('other')) {
+          facilities++;
+        } else if (cat.includes('wi-fi') || cat.includes('internet') || cat.includes('it')) {
+          it++;
+        } else {
+          safetyAv++;
+        }
+      });
+
+      const facPct = total > 0 ? Math.round((facilities / total) * 100) : 0;
+      const itPct = total > 0 ? Math.round((it / total) * 100) : 0;
+      const safePct = total > 0 ? Math.max(0, 100 - facPct - itPct) : 0;
+
+      const centerEl = document.querySelector('.donut__center');
+      if (centerEl) {
+        centerEl.innerHTML = '<b>' + total + '</b><span>reports</span>';
+      }
+
+      const legendEl = document.querySelector('.mix__legend');
+      if (legendEl) {
+        legendEl.innerHTML = '<li><i class="dot" style="background: var(--c-tangerine)"></i><span class="name">Facilities</span><span class="pct">' + facPct + '%</span></li>'
+          + '<li><i class="dot" style="background: var(--c-teal)"></i><span class="name">IT & Wi-Fi</span><span class="pct">' + itPct + '%</span></li>'
+          + '<li><i class="dot" style="background: var(--c-violet)"></i><span class="name">Safety / AV</span><span class="pct">' + safePct + '%</span></li>';
+      }
+
+      const circumference = 326.7;
+      const circles = document.querySelectorAll('#mix-chart circle:not(.donut__track)');
+      if (circles.length >= 3) {
+        if (total > 0) {
+          const facLen = (facPct / 100) * circumference;
+          const itLen = (itPct / 100) * circumference;
+          const safeLen = (safePct / 100) * circumference;
+
+          circles[0].setAttribute('stroke-dasharray', facLen.toFixed(1) + ' ' + circumference);
+          circles[0].setAttribute('stroke-dashoffset', '0');
+
+          circles[1].setAttribute('stroke-dasharray', itLen.toFixed(1) + ' ' + circumference);
+          circles[1].setAttribute('stroke-dashoffset', (-facLen).toFixed(1));
+
+          circles[2].setAttribute('stroke-dasharray', safeLen.toFixed(1) + ' ' + circumference);
+          circles[2].setAttribute('stroke-dashoffset', (-(facLen + itLen)).toFixed(1));
+        } else {
+          circles.forEach(c => {
+            c.setAttribute('stroke-dasharray', '0 ' + circumference);
+          });
+        }
+      }
+    }
+
+    function refreshData(showFeedback = false) {
+      const reports = getStorageReports();
+      const total = reports.length;
+      const pending = reports.filter(r => r.status === 'Submitted' || r.status === 'Under Review').length;
+      const progress = reports.filter(r => r.status === 'In Progress').length;
+      const resolved = reports.filter(r => r.status === 'Resolved').length;
+      const critical = reports.filter(r => r.priority === 'Critical').length;
+
+      const totalEl = document.getElementById('dashTotalNum');
+      if (totalEl) totalEl.textContent = total.toLocaleString();
+
+      const pendEl = document.getElementById('dashPendingNum');
+      if (pendEl) pendEl.textContent = pending;
+
+      const progEl = document.getElementById('dashProgressNum');
+      if (progEl) progEl.textContent = progress;
+
+      const resEl = document.getElementById('dashResolvedNum');
+      if (resEl) resEl.textContent = resolved;
+
+      const compEl = document.getElementById('dashCompletionRate');
+      if (compEl) {
+        const rate = total > 0 ? ((resolved / total) * 100).toFixed(1) : "0.0";
+        compEl.textContent = rate;
+      }
+
+      const critBadge = document.getElementById('sidebarCriticalBadge');
+      if (critBadge) critBadge.textContent = critical;
+
+      // Fully update all dashboard modules
+      updateOverviewFeed();
+      if (typeof updateMonthlyDiagram === "function") updateMonthlyDiagram(currentChartYear);
+      if (typeof updateCategoryMix === "function") updateCategoryMix(currentMixPeriod);
+      if (typeof updateTopTeams === "function") updateTopTeams(currentTopRange);
+      if (typeof filterAdminTable === "function") filterAdminTable();
+
+      if (showFeedback) {
+        const syncBtn = document.getElementById('syncBtn');
+        const syncSvg = syncBtn ? syncBtn.querySelector('svg') : null;
+        if (syncSvg && window.gsap) {
+          gsap.to(syncSvg, {
+            rotation: '+=360',
+            duration: 0.8,
+            ease: 'power2.inOut'
+          });
+        }
+        const syncWhen = document.getElementById('sync-when');
+        if (syncWhen) syncWhen.textContent = 'Just now';
+      }
+    }
+
+    function topUpBudget() {
+      currentFund += 250;
+      const el = document.getElementById('creditsVal');
+      if (el) {
+        el.textContent = '$' + currentFund.toLocaleString();
+        if (window.gsap) {
+          gsap.fromTo(el, { scale: 1.3, color: 'var(--c-tangerine)' }, { scale: 1, color: 'inherit', duration: 0.45, ease: 'back.out(2)' });
+        }
+      }
+      showToast('Allocated +$250 to Maintenance Fund.');
+    }
+
+    // Toggle segment buttons in campus cards
+    function setSentRange(range) {
+      document.querySelectorAll('#sent .seg button').forEach(b => b.classList.remove('is-active'));
+      document.getElementById('btnSent' + range)?.classList.add('is-active');
+      showToast("Sent volume filtered to " + range + ".");
+    }
+
+    function setMonthYear(year) {
+      document.querySelectorAll('#month .seg button').forEach(b => b.classList.remove('is-active'));
+      document.getElementById('btnYear' + year)?.classList.add('is-active');
+      showToast("Dispatches by month showing year " + year + ".");
+    }
+
+    function setMixPeriod(period) {
+      document.querySelectorAll('#mix .seg button').forEach(b => b.classList.remove('is-active'));
+      document.getElementById('btnMix' + (period === 'month' ? 'Month' : 'Last'))?.classList.add('is-active');
+      showToast("Category mix period updated: " + period + ".");
+    }
+
+    function setTopRange(range) {
+      document.querySelectorAll('#top-contacts .seg button').forEach(b => b.classList.remove('is-active'));
+      document.getElementById('btnTop' + (range === 'week' ? 'Week' : 'Month'))?.classList.add('is-active');
+      showToast("Top response teams showing " + range + " volume.");
+    }
+
+    // --- MASTER ENTRANCE ANIMATION TIMELINE ---
+    function runMasterEntrance() {
+      if (!window.gsap) {
+        document.querySelectorAll('.rail__logo, .rail__item, .top__hello>*, .top__tools>*, [data-view=overview] .card, .campus-hero-banner, .campus-stat-card, .campus-lookup-card, .campus-feed-card').forEach(el => {
+          el.style.opacity = '1';
+        });
+        return;
+      }
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+      // 1. Rail items slide from left
+      tl.fromTo('.rail__logo, .rail__item', 
+        { opacity: 0, x: -10 }, 
+        { opacity: 1, x: 0, duration: 0.5, stagger: 0.035, clearProps: 'transform' }, 
+        0
+      );
+
+      // 2. Title & greeting
+      tl.fromTo('.top__title .w', 
+        { yPercent: 70, opacity: 0 }, 
+        { yPercent: 0, opacity: 1, duration: 0.6, stagger: 0.06, ease: 'power3.out', clearProps: 'transform' }, 
+        0.05
+      );
+      tl.fromTo('.top__sub', 
+        { opacity: 0, y: 6 }, 
+        { opacity: 1, y: 0, duration: 0.5, delay: 0.15, ease: 'power3.out', clearProps: 'transform' }, 
+        0.05
+      );
+
+      // 3. Top tools ease down
+      tl.fromTo('.top__tools > *', 
+        { opacity: 0, y: -6 }, 
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.05, clearProps: 'transform' }, 
+        0.1
+      );
+
+      // 4. Dashboard cards ease up
+      tl.fromTo('.campus-hero-banner, .campus-stat-card, .campus-lookup-card, .campus-feed-card, [data-view="overview"] .card', 
+        { opacity: 0, y: 22, scale: 0.985 }, 
+        { opacity: 1, y: 0, scale: 1, duration: 0.65, stagger: 0.05, ease: 'power3.out', clearProps: 'transform' }, 
+        0.15
+      );
+
+      // 5. Category Mix Donut Animation if present
+      if (document.querySelector('.donut')) {
+        tl.fromTo('.donut', 
+          { scale: 0.85, opacity: 0 }, 
+          { scale: 1, opacity: 1, duration: 0.6, ease: 'back.out(1.4)', clearProps: 'transform' }, 
+          0.3
+        );
+      }
+
+      // 6. Guarantee 100% visibility for all elements on complete
+      tl.call(() => {
+        document.querySelectorAll('.rail__logo, .rail__item, .top__hello>*, .top__tools>*, [data-view=overview] .card, .campus-hero-banner, .campus-stat-card, .campus-lookup-card, .campus-feed-card').forEach(el => {
+          el.style.opacity = '1';
+          el.style.visibility = 'visible';
+        });
+      });
+    }
+
+    // Hover tooltips on rail items
+    function setupRailTooltips() {
+      const railTip = document.getElementById('rail-tip');
+      const railPanel = document.getElementById('rail-panel');
+      if (!railTip || !railPanel) return;
+
+      document.querySelectorAll('.rail__item').forEach(item => {
+        item.addEventListener('mouseenter', () => {
+          if (document.documentElement.classList.contains('rail-open')) return;
+          const label = item.querySelector('.rail__label')?.textContent || '';
+          if (!label) return;
+          railTip.textContent = label;
+          const rect = item.getBoundingClientRect();
+          const panelRect = railPanel.getBoundingClientRect();
+          const y = rect.top - panelRect.top + (rect.height / 2) - 14;
+          if (window.gsap) {
+            gsap.to(railTip, {
+              y: y,
+              opacity: 1,
+              duration: 0.2,
+              ease: 'power2.out',
+              overwrite: true
+            });
+          } else {
+            railTip.style.transform = "translateY(" + y + "px)";
+            railTip.style.opacity = '1';
+          }
+        });
+        item.addEventListener('mouseleave', () => {
+          if (window.gsap) {
+            gsap.to(railTip, { opacity: 0, duration: 0.15, overwrite: true });
+          } else {
+            railTip.style.opacity = '0';
+          }
+        });
+      });
+    }
+
+    // Keyboard Shortcuts
+    function setupShortcuts() {
+      window.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        if (e.key === '[') {
+          e.preventDefault();
+          toggleSidebar();
+        }
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          const s = document.getElementById('topGlobalSearch');
+          if (s) {
+            s.focus();
+            s.select();
+          }
+        }
+      });
+    }
+
+    // Robust DOM Initialization
+    function initApp() {
+      try {
+        if (localStorage.getItem('campus:rail') === '1') {
+          document.documentElement.classList.add('rail-open');
+          const toggleBtn = document.getElementById('rail-toggle');
+          if (toggleBtn) {
+            toggleBtn.setAttribute('aria-expanded', 'true');
+            const label = toggleBtn.querySelector('.rail__label');
+            if (label) label.textContent = 'Collapse sidebar';
+          }
+        }
+      } catch (e) {}
+
+      try { getStorageReports(); } catch(e) { console.error(e); }
+      try { renderChatWindow(); } catch(e) { console.error(e); }
+      try { refreshData(); } catch(e) { console.error(e); }
+      try { setupRailTooltips(); } catch(e) { console.error(e); }
+      try { setupShortcuts(); } catch(e) { console.error(e); }
+      try { moveRailPill('overview', false); } catch(e) { console.error(e); }
+      try { runMasterEntrance(); } catch(e) { console.error(e); }
+      try { applyTheme(currentTheme); } catch(e) { console.error(e); }
+    }
+
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
+  </script>
+</body>
+</html>
