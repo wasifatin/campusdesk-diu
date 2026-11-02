@@ -124,10 +124,9 @@ export default function AdminPage() {
           </button>
           <button
             type="button"
-            className="btn-action btn-ghost-dark"
+            className="btn-action btn-danger-ghost"
             onClick={handleClearHistory}
             title="Clear all incident history and audit logs"
-            style={{ color: "#ef4444", borderColor: "rgba(239, 68, 68, 0.4)" }}
           >
             <svg
               width="15"
