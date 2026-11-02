@@ -2187,3 +2187,218 @@
   border-color: #38bdf8 !important;
   box-shadow: 0 4px 16px rgba(56, 189, 248, 0.25) !important;
 }
+
+
+/* =============================================================
+   17. SIDEBAR EXPANSION, TRANSITIONS & THEME CONTRAST POLISH
+   ============================================================= */
+
+/* 1. Bulletproof Sidebar Expansion in Next.js for both html.rail-open and .app.rail-open */
+html.rail-open,
+.app.rail-open {
+  --rail-w: var(--rail-open) !important;
+}
+html.rail-open .rail__panel,
+.app.rail-open .rail__panel {
+  clip-path: inset(0 round 24px) !important;
+}
+html.rail-open .rail__label,
+html.rail-open .rail__brand,
+.app.rail-open .rail__label,
+.app.rail-open .rail__brand {
+  opacity: 1 !important;
+  translate: 0 !important;
+}
+html.rail-open .rail__chev,
+.app.rail-open .rail__chev {
+  transform: scaleX(-1) !important;
+}
+
+/* 2. Bouncy Sliding Nav Indicator Pill & High Contrast Active Icons */
+.rail__list {
+  position: relative !important;
+}
+.rail__pill {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 46px !important;
+  height: 46px !important;
+  border-radius: 14px !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+  background: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+}
+[data-theme="dark"] .rail__pill {
+  background: #0284c7 !important;
+  box-shadow: 0 4px 16px rgba(2, 132, 199, 0.5) !important;
+}
+.rail__item {
+  position: relative !important;
+  z-index: 2 !important;
+}
+.rail__item.is-active .rail__icon {
+  background: transparent !important;
+  color: #1c1917 !important;
+}
+[data-theme="dark"] .rail__item.is-active .rail__icon {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+/* 3. Section-to-Section View Pane Entrance Animation */
+@keyframes viewPaneEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.988);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.view-pane-enter {
+  animation: viewPaneEnter 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  width: 100%;
+  min-width: 0;
+}
+
+/* 4. Topbar Page Title & Subtitle Entrance Animation */
+@keyframes topTitleWord {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes topSubFade {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.top__title .w {
+  display: inline-block;
+  margin-right: 0.28em;
+  animation: topTitleWord 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.top__title .w:nth-child(2) {
+  animation-delay: 0.05s;
+}
+.top__title .w:nth-child(3) {
+  animation-delay: 0.1s;
+}
+.top__title .w:nth-child(4) {
+  animation-delay: 0.15s;
+}
+.top__sub {
+  animation: topSubFade 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* 5. Tooltip High-Contrast Styling in Dark and Light Themes */
+.rail__tip {
+  background: #1e1b24 !important;
+  color: #ffffff !important;
+  font-size: var(--fs-sm) !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+  pointer-events: none !important;
+  border-radius: 9px !important;
+  padding: 7px 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5) !important;
+  z-index: 100 !important;
+}
+[data-theme="dark"] .rail__tip {
+  background: #1e293b !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.75) !important;
+}
+
+/* 6. Caution / Emergency Pill Completely Removed */
+.rail__emergency {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* 7. Hero Logo Showcase - High Contrast in Light and Dark Mode */
+.hero-logo-showcase {
+  background: #0e131f !important;
+  border: 1.5px solid rgba(0, 0, 0, 0.18) !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.16) !important;
+  border-radius: 18px !important;
+  padding: 16px 22px !important;
+}
+[data-theme="dark"] .hero-logo-showcase {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* 8. Top Response Teams Avatar Badges */
+.person__av.av--t0, .av--t0 {
+  background: #fee2e2 !important;
+  color: #991b1b !important;
+  border: 1px solid rgba(185, 28, 28, 0.25) !important;
+}
+.person__av.av--t1, .av--t1 {
+  background: #ede9fe !important;
+  color: #5b21b6 !important;
+  border: 1px solid rgba(109, 40, 217, 0.25) !important;
+}
+.person__av.av--t2, .av--t2 {
+  background: #ccfbf1 !important;
+  color: #115e59 !important;
+  border: 1px solid rgba(17, 94, 89, 0.25) !important;
+}
+[data-theme="dark"] .person__av.av--t0, [data-theme="dark"] .av--t0 {
+  background: rgba(239, 68, 68, 0.25) !important;
+  color: #fca5a5 !important;
+  border: 1px solid rgba(239, 68, 68, 0.45) !important;
+}
+[data-theme="dark"] .person__av.av--t1, [data-theme="dark"] .av--t1 {
+  background: rgba(168, 85, 247, 0.25) !important;
+  color: #d8b4fe !important;
+  border: 1px solid rgba(168, 85, 247, 0.45) !important;
+}
+[data-theme="dark"] .person__av.av--t2, [data-theme="dark"] .av--t2 {
+  background: rgba(20, 184, 166, 0.25) !important;
+  color: #5eead4 !important;
+  border: 1px solid rgba(20, 184, 166, 0.55) !important;
+}
+
+/* 9. Reports by Month Diagram Styling */
+.card--month .cols,
+.cols {
+  min-height: 300px !important;
+  height: 300px !important;
+  overflow: visible !important;
+}
+.cols__axis {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  fill: #475569 !important;
+  user-select: none;
+}
+.cols__axis.is-on {
+  fill: #0f172a !important;
+  font-weight: 800 !important;
+}
+[data-theme="dark"] .cols__axis {
+  fill: #94a3b8 !important;
+}
+[data-theme="dark"] .cols__axis.is-on {
+  fill: #38bdf8 !important;
+  font-weight: 800 !important;
+}

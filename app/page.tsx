@@ -163,8 +163,8 @@ export default function OverviewPage() {
   else if (maxTotal > 200 && maxTotal <= 1000) yMax = 1000;
   else if (maxTotal > 1000) yMax = Math.ceil(maxTotal / 500) * 500;
 
-  const baselineY = 220;
-  const chartHeight = 190;
+    const baselineY = 245;
+  const chartHeight = 205;
   const topY = baselineY - chartHeight;
 
   const yTicks = [
@@ -249,7 +249,7 @@ export default function OverviewPage() {
         <div className="hero-logo-showcase" title="CampusDesk Official Logo">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={theme === "dark" ? "/logo-dark.png" : "/logo-transparent.png"}
+            src="/logo-dark.png"
             alt="CampusDesk Official Logo"
             className="hero-logo-img"
           />
@@ -465,7 +465,7 @@ export default function OverviewPage() {
           </div>
         </div>
         <div className="cols" id="month-chart" tabIndex={0} role="group" aria-label="Reports by month: calculated dynamically from submitted and solved records.">
-          <svg viewBox="0 0 1000 270" aria-hidden="true" preserveAspectRatio="none">
+          <svg viewBox="0 0 1000 300" aria-hidden="true" preserveAspectRatio="none" style={{ width: "100%", height: "300px", display: "block" }}>
             <defs>
               <pattern id="hatch-t-next" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
                 <rect width="6" height="6" fill="var(--c-tangerine-soft)"></rect>
@@ -476,7 +476,7 @@ export default function OverviewPage() {
               {yTicks.map((tick, idx) => (
                 <React.Fragment key={idx}>
                   <line className="cols__grid" x1={40} x2={980} y1={tick.y} y2={tick.y} />
-                  <text className="cols__axis" textAnchor="end" x={32} y={tick.y + 4}>{formatTick(tick.val)}</text>
+                  <text className="cols__axis" textAnchor="end" x={32} y={tick.y + 5} fontSize={15} fontWeight="600">{formatTick(tick.val)}</text>
                 </React.Fragment>
               ))}
             </g>
@@ -541,7 +541,9 @@ export default function OverviewPage() {
                     className={`cols__axis ${isCurrentMonth || isHovered ? "is-on" : ""}`}
                     textAnchor="middle"
                     x={xCenter}
-                    y={252}
+                    y={280}
+                    fontSize={16}
+                    fontWeight={isCurrentMonth || isHovered ? "800" : "700"}
                   >
                     {d.month}
                   </text>

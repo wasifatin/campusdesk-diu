@@ -10,6 +10,91 @@ interface AppShellProps {
   children: React.ReactNode;
 }
 
+const NAV_ITEMS = [
+  {
+    href: "/",
+    label: "Overview",
+    pageId: "overview",
+    match: (p: string) => p === "/" || p === "/dashboard",
+    icon: (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3.5" y="3.5" width="7" height="7" rx="2" />
+        <rect x="13.5" y="3.5" width="7" height="7" rx="2" />
+        <rect x="3.5" y="13.5" width="7" height="7" rx="2" />
+        <rect x="13.5" y="13.5" width="7" height="7" rx="2" />
+      </svg>
+    ),
+  },
+  {
+    href: "/chat",
+    label: "AI Assistant",
+    pageId: "chat",
+    badge: "AI",
+    match: (p: string) => p.startsWith("/chat"),
+    icon: (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5V17A2.5 2.5 0 0 1 4 14.5z" />
+      </svg>
+    ),
+  },
+  {
+    href: "/report",
+    label: "Report Issue",
+    pageId: "report",
+    match: (p: string) => p.startsWith("/report"),
+    icon: (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+    ),
+  },
+  {
+    href: "/track",
+    label: "Track Status",
+    pageId: "track",
+    match: (p: string) => p.startsWith("/track"),
+    icon: (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="8.5" />
+        <path d="M12 7.5V12l3 2" />
+      </svg>
+    ),
+  },
+  {
+    href: "/admin",
+    label: "Staff Triage Desk",
+    pageId: "admin",
+    match: (p: string) => p.startsWith("/admin"),
+    icon: (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20.5 3.5 3.5 10.6l6.6 2.8 2.8 6.6z" />
+        <path d="m10.1 13.4 4.2-4.2" />
+      </svg>
+    ),
+  },
+  {
+    href: "/about",
+    label: "About & System",
+    pageId: "about",
+    match: (p: string) => p.startsWith("/about"),
+    icon: (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 8h.01M11 12h1v4h1" />
+      </svg>
+    ),
+  },
+];
+
+const ROUTE_INFO: Record<string, { title: string; sub: string }> = {
+  overview: { title: "Campus Desk", sub: "Here’s how your campus operations moved today." },
+  chat: { title: "AI Assistant", sub: "Grounded conversational campus dispatch & knowledge support." },
+  report: { title: "Report Incident", sub: "Submit facility disruptions for automated triage & routing." },
+  track: { title: "Track Resolution", sub: "Real-time 4-stage lifecycle milestones & technician audit trail." },
+  admin: { title: "Staff Admin Triage Desk", sub: "Incident management, priority overrides, and audit spreadsheets." },
+  about: { title: "About CampusDesk", sub: "Architecture disclosures, local storage safety, and emergency contacts." },
+};
+
 export function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
   const router = useRouter();
@@ -23,13 +108,26 @@ export function AppShell({ children }: AppShellProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [hoveredTip, setHoveredTip] = useState<{ text: string; top: number } | null>(null);
 
+  const toggleSidebar = useCallback(() => {
+    setRailOpen((prev) => {
+      const next = !prev;
+      if (typeof document !== "undefined") {
+        document.documentElement.classList.toggle("rail-open", next);
+      }
+      try {
+        localStorage.setItem("campus:rail", next ? "1" : "0");
+      } catch (e) {}
+      return next;
+    });
+  }, []);
+
   const handleNavMouseEnter = (e: React.MouseEvent<HTMLElement>, label: string) => {
     if (railOpen) return;
     const panel = document.getElementById("rail-panel");
     if (!panel) return;
     const targetRect = e.currentTarget.getBoundingClientRect();
     const panelRect = panel.getBoundingClientRect();
-    const y = targetRect.top - panelRect.top + (targetRect.height / 2) - 14;
+    const y = targetRect.top - panelRect.top + targetRect.height / 2 - 14;
     setHoveredTip({ text: label, top: y });
   };
 
@@ -49,6 +147,17 @@ export function AppShell({ children }: AppShellProps) {
     setTheme(savedTheme);
     document.documentElement.setAttribute("data-theme", savedTheme);
 
+    // Restore sidebar rail state from localStorage
+    try {
+      const savedRail = localStorage.getItem("campus:rail");
+      if (savedRail === "1") {
+        setRailOpen(true);
+        document.documentElement.classList.add("rail-open");
+      } else {
+        document.documentElement.classList.remove("rail-open");
+      }
+    } catch (e) {}
+
     updateCounts();
 
     const timer = setTimeout(() => {
@@ -59,12 +168,35 @@ export function AppShell({ children }: AppShellProps) {
     window.addEventListener("campusdesk_storage_updated", handleStorageChange);
     window.addEventListener("storage", handleStorageChange);
 
+    // Global keyboard shortcuts: '[' to toggle sidebar, '⌘K' / 'Ctrl+K' to focus search
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) {
+        return;
+      }
+      if (e.key === "[") {
+        e.preventDefault();
+        toggleSidebar();
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        const searchInput = document.getElementById("topGlobalSearch") as HTMLInputElement;
+        if (searchInput) {
+          searchInput.focus();
+          searchInput.select();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
     return () => {
       clearTimeout(timer);
       window.removeEventListener("campusdesk_storage_updated", handleStorageChange);
       window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [updateCounts]);
+  }, [updateCounts, toggleSidebar]);
 
   const toggleTheme = () => {
     const next = theme === "dark" ? "light" : "dark";
@@ -117,21 +249,15 @@ export function AppShell({ children }: AppShellProps) {
     }
   };
 
-  const getPageTitle = () => {
-    if (pathname === "/" || pathname === "/dashboard") return "Campus Desk";
-    if (pathname.startsWith("/chat")) return "Conversational AI";
-    if (pathname.startsWith("/report")) return "Report Issue";
-    if (pathname.startsWith("/track")) return "Track Resolution";
-    if (pathname.startsWith("/admin")) return "Staff Admin Triage Desk";
-    if (pathname.startsWith("/about")) return "About & Disclosures";
-    return "Operations";
-  };
+  const activeIndex = NAV_ITEMS.findIndex((item) => item.match(pathname));
+  const activeItem = NAV_ITEMS[activeIndex >= 0 ? activeIndex : 0];
+  const routeMeta = ROUTE_INFO[activeItem.pageId] || ROUTE_INFO.overview;
 
   const logoFile = "/logo-dark.png";
 
   return (
     <>
-      {/* 1. Cinematic Startup Logo Splash (Clean Logo, No Text Beneath It) */}
+      {/* 1. Cinematic Startup Logo Splash */}
       {splashVisible && (
         <div
           id="startupSplash"
@@ -168,92 +294,42 @@ export function AppShell({ children }: AppShellProps) {
             </Link>
 
             <div className="rail__list">
+              {/* Bouncy Spring Active Indicator Pill */}
+              <div
+                className="rail__pill"
+                aria-hidden="true"
+                style={{
+                  opacity: activeIndex >= 0 ? 1 : 0,
+                  transform: `translateY(${activeIndex >= 0 ? activeIndex * 54 : 0}px)`,
+                  transition: "transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease",
+                }}
+              />
               <ul className="rail__ul" role="list">
-                <li>
-                  <Link
-                    href="/"
-                    className={`rail__item ${pathname === "/" || pathname === "/dashboard" ? "is-active" : ""}`}
-                    onMouseEnter={(e) => handleNavMouseEnter(e, "Overview")}
-                    onMouseLeave={handleNavMouseLeave}
-                    aria-current={pathname === "/" || pathname === "/dashboard" ? "page" : undefined}
-                  >
-                    <span className="rail__icon">
-                      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="2"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="2"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="2"></rect></svg>
-                    </span>
-                    <span className="rail__label">Overview</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/chat"
-                    className={`rail__item ${pathname.startsWith("/chat") ? "is-active" : ""}`}
-                    onMouseEnter={(e) => handleNavMouseEnter(e, "AI Assistant")}
-                    onMouseLeave={handleNavMouseLeave}
-                  >
-                    <span className="rail__icon">
-                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5V17A2.5 2.5 0 0 1 4 14.5z"></path></svg>
-                      <span className="rail__badge" aria-hidden="true">AI</span>
-                    </span>
-                    <span className="rail__label">AI Assistant</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/report"
-                    className={`rail__item ${pathname.startsWith("/report") ? "is-active" : ""}`}
-                    onMouseEnter={(e) => handleNavMouseEnter(e, "Report Issue")}
-                    onMouseLeave={handleNavMouseLeave}
-                  >
-                    <span className="rail__icon">
-                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
-                    </span>
-                    <span className="rail__label">Report Issue</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/track"
-                    className={`rail__item ${pathname.startsWith("/track") ? "is-active" : ""}`}
-                    onMouseEnter={(e) => handleNavMouseEnter(e, "Track Status")}
-                    onMouseLeave={handleNavMouseLeave}
-                  >
-                    <span className="rail__icon">
-                      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg>
-                    </span>
-                    <span className="rail__label">Track Status</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/admin"
-                    className={`rail__item ${pathname.startsWith("/admin") ? "is-active" : ""}`}
-                    onMouseEnter={(e) => handleNavMouseEnter(e, "Staff Triage Desk")}
-                    onMouseLeave={handleNavMouseLeave}
-                  >
-                    <span className="rail__icon">
-                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.5 3.5 10.6l6.6 2.8 2.8 6.6z"></path><path d="m10.1 13.4 4.2-4.2"></path></svg>
-                      {criticalCount > 0 && <span className="rail__badge" aria-hidden="true">{criticalCount}</span>}
-                    </span>
-                    <span className="rail__label">Staff Triage Desk</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/about"
-                    className={`rail__item ${pathname.startsWith("/about") ? "is-active" : ""}`}
-                    onMouseEnter={(e) => handleNavMouseEnter(e, "About & System")}
-                    onMouseLeave={handleNavMouseLeave}
-                  >
-                    <span className="rail__icon">
-                      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 8h.01M11 12h1v4h1"></path></svg>
-                    </span>
-                    <span className="rail__label">About & System</span>
-                  </Link>
-                </li>
+                {NAV_ITEMS.map((item, idx) => {
+                  const isActive = idx === activeIndex;
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        className={`rail__item ${isActive ? "is-active" : ""}`}
+                        onMouseEnter={(e) => handleNavMouseEnter(e, item.label)}
+                        onMouseLeave={handleNavMouseLeave}
+                        aria-current={isActive ? "page" : undefined}
+                      >
+                        <span className="rail__icon">
+                          {item.icon}
+                          {item.badge && <span className="rail__badge" aria-hidden="true">{item.badge}</span>}
+                          {item.pageId === "admin" && criticalCount > 0 && (
+                            <span className="rail__badge" aria-hidden="true">{criticalCount}</span>
+                          )}
+                        </span>
+                        <span className="rail__label">{item.label}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
-
-
 
             {/* Expand / Collapse Button */}
             <button
@@ -262,14 +338,20 @@ export function AppShell({ children }: AppShellProps) {
               type="button"
               aria-controls="rail-panel"
               aria-expanded={railOpen}
-              onClick={() => setRailOpen(!railOpen)}
+              onClick={toggleSidebar}
+              title={railOpen ? "Collapse sidebar ([)" : "Expand sidebar ([)"}
             >
               <span className="rail__icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="3"></rect><path d="M9.5 4v16"></path><path className="rail__chev" d="m13.5 10 2 2-2 2"></path></svg>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="3.5" y="4" width="17" height="16" rx="3" />
+                  <path d="M9.5 4v16" />
+                  <path className="rail__chev" d="m13.5 10 2 2-2 2" />
+                </svg>
               </span>
               <span className="rail__label">{railOpen ? "Collapse sidebar" : "Expand sidebar"}</span>
             </button>
           </div>
+
           {hoveredTip && !railOpen && (
             <span
               className="rail__tip"
@@ -283,6 +365,10 @@ export function AppShell({ children }: AppShellProps) {
                 left: "calc(100% + 12px)",
                 zIndex: 100,
                 pointerEvents: "none",
+                background: theme === "dark" ? "#1e293b" : "#221b26",
+                color: "#ffffff",
+                border: "1px solid rgba(255, 255, 255, 0.22)",
+                boxShadow: "0 10px 28px rgba(0, 0, 0, 0.5)",
                 transition: "transform 0.15s ease-out, opacity 0.15s ease-out",
               }}
             >
@@ -295,16 +381,25 @@ export function AppShell({ children }: AppShellProps) {
         <header className="top">
           <div className="top__hello">
             <h1 className="top__title" id="topbarPageTitle" tabIndex={-1}>
-              <span className="w">{getPageTitle()}</span>
+              {routeMeta.title.split(" ").map((word, wIdx) => (
+                <span key={`${pathname}-w-${wIdx}`} className="w">
+                  {word}
+                </span>
+              ))}
             </h1>
-            <p className="top__sub" id="topbarPageSub">Here’s how your campus operations moved today.</p>
+            <p key={`${pathname}-sub`} className="top__sub" id="topbarPageSub">
+              {routeMeta.sub}
+            </p>
           </div>
 
           <div className="top__tools">
             {/* Search Input */}
             <form onSubmit={handleSearchSubmit} className="search" role="search">
               <label className="sr-only" htmlFor="topGlobalSearch">Search incidents</label>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="11" cy="11" r="6.5" />
+                <path d="m16 16 4 4" />
+              </svg>
               <input
                 id="topGlobalSearch"
                 type="text"
@@ -319,7 +414,10 @@ export function AppShell({ children }: AppShellProps) {
 
             {/* Sync Button */}
             <button className="sync" type="button" onClick={() => updateCounts()} title="Synchronize telemetry">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 0 1-14.3 4.9M4 12A8 8 0 0 1 18.3 7.1"></path><path d="M18.5 3v4.3h-4.3M5.5 21v-4.3h4.3"></path></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20 12a8 8 0 0 1-14.3 4.9M4 12A8 8 0 0 1 18.3 7.1" />
+                <path d="M18.5 3v4.3h-4.3M5.5 21v-4.3h4.3" />
+              </svg>
               <span className="sync__text">
                 <span className="sync__label">Last sync</span>
                 <span className="sync__when">Just now</span>
@@ -328,13 +426,17 @@ export function AppShell({ children }: AppShellProps) {
 
             {/* History Audit Button */}
             <button className="quick-pill-btn" type="button" onClick={handleExportSpreadsheet} title="Download complete incident audit spreadsheet (.CSV)">
-              <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
               <span>History Audit</span>
             </button>
 
             {/* Clear History Button */}
             <button className="quick-pill-btn" type="button" onClick={handleClearHistory} title="Clear all incident history and audit records" style={{ color: "#ef4444", borderColor: "rgba(239, 68, 68, 0.35)" }}>
-              <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
               <span>Clear History</span>
             </button>
 
@@ -389,9 +491,11 @@ export function AppShell({ children }: AppShellProps) {
           </div>
         </header>
 
-        {/* 4. Main Views Container */}
+        {/* 4. Main Views Container with smooth section-to-section entrance transition */}
         <main className="views" id="main">
-          {children}
+          <div key={pathname} className="view-pane-enter">
+            {children}
+          </div>
         </main>
       </div>
     </>
