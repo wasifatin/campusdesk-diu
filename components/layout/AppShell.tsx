@@ -282,16 +282,9 @@ export function AppShell({ children }: AppShellProps) {
               <span className="rail__mark">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  className="campus-logo-img logo-light-only"
-                  src="/logo-transparent.png"
-                  alt="CampusDesk Logo"
-                  style={{ width: 26, height: 26, objectFit: "contain" }}
-                />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  className="campus-logo-img logo-dark-only"
+                  className="campus-logo-img"
                   src="/logo-dark.png"
-                  alt="CampusDesk Logo"
+                  alt="Logo"
                   style={{ width: 26, height: 26, objectFit: "contain" }}
                 />
               </span>
@@ -488,17 +481,10 @@ export function AppShell({ children }: AppShellProps) {
             <button className="avatar" type="button" title="CampusDesk Operations Desk" aria-label="CampusDesk Logo & Account">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                className="topbar-logo-img logo-light-only"
-                src="/logo-transparent.png"
+                className="topbar-logo-img"
+                src={theme === "dark" ? "/logo-dark.png" : "/logo-transparent.png"}
                 alt="CampusDesk Logo"
-                style={{ width: "30px", height: "30px", objectFit: "contain" }}
-              />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                className="topbar-logo-img logo-dark-only"
-                src="/logo-dark.png"
-                alt="CampusDesk Logo"
-                style={{ width: "30px", height: "30px", objectFit: "contain" }}
+                style={{ width: 30, height: 30, objectFit: "contain" }}
               />
             </button>
           </div>

@@ -2404,25 +2404,13 @@ html.rail-open .rail__chev,
 }
 
 
+
+
 /* =============================================================
    18. THEME MASTER POLISH: DUAL LOGO, BORDERS, TOOLTIPS, AVATARS
    ============================================================= */
 
-/* 1. Dynamic Dual Logo Switching (Zero Latency CSS) */
-.logo-dark-only {
-  display: none !important;
-}
-.logo-light-only {
-  display: block !important;
-}
-[data-theme="dark"] .logo-dark-only {
-  display: block !important;
-}
-[data-theme="dark"] .logo-light-only {
-  display: none !important;
-}
-
-/* 2. Hero Logo Showcase Card */
+/* 1. Hero Logo Showcase Card */
 .hero-logo-showcase {
   background: #ffffff !important;
   border: 1.5px solid #d1c4b2 !important;
@@ -2446,11 +2434,11 @@ html.rail-open .rail__chev,
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5) !important;
 }
 
-/* 3. Hero Banner & Text High Contrast */
+/* 2. Hero Banner & Text High Contrast */
 .campus-hero-banner {
   background: linear-gradient(135deg, #ffffff 0%, #faf6f0 100%) !important;
-  border: 1.5px solid #c5b6a3 !important;
-  border-bottom: 1.5px solid #c5b6a3 !important;
+  border: 1px solid #d1c4b2 !important;
+  border-bottom: 1px solid #d1c4b2 !important;
   border-radius: 22px !important;
   box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.08) !important;
   color: #1c1917 !important;
@@ -2463,8 +2451,8 @@ html.rail-open .rail__chev,
 }
 [data-theme="dark"] .campus-hero-banner {
   background: linear-gradient(135deg, #111827 0%, #0f172a 100%) !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.22) !important;
-  border-bottom: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5) !important;
   color: #f8fafc !important;
 }
@@ -2475,7 +2463,7 @@ html.rail-open .rail__chev,
   color: #cbd5e1 !important;
 }
 
-/* 4. Complete 4-Sided High Visibility Borders on ALL Cards & Functions */
+/* 3. Complete 4-Sided High Visibility Borders on ALL Cards & Functions (Matches index.html exactly) */
 .card,
 .campus-stat-card,
 .campus-card,
@@ -2486,11 +2474,12 @@ html.rail-open .rail__chev,
 #top-contacts,
 .bento-insights-grid .card,
 .campus-chat-box {
-  border: 1.5px solid #c5b6a3 !important;
-  border-top: 1.5px solid #c5b6a3 !important;
-  border-bottom: 1.5px solid #c5b6a3 !important;
-  border-left: 1.5px solid #c5b6a3 !important;
-  border-right: 1.5px solid #c5b6a3 !important;
+  background: var(--surface) !important;
+  border: 1px solid #d1c4b2 !important;
+  border-top: 1px solid #d1c4b2 !important;
+  border-bottom: 1px solid #d1c4b2 !important;
+  border-left: 1px solid #d1c4b2 !important;
+  border-right: 1px solid #d1c4b2 !important;
   box-shadow: 0 2px 10px -2px rgba(28, 25, 23, 0.08), 0 1px 3px rgba(28, 25, 23, 0.04) !important;
   box-sizing: border-box !important;
 }
@@ -2503,8 +2492,9 @@ html.rail-open .rail__chev,
 
 .campus-stat-card {
   overflow: visible !important;
-  border: 1.5px solid #c5b6a3 !important;
-  border-bottom: 1.5px solid #c5b6a3 !important;
+  border-radius: 20px !important;
+  border: 1px solid #d1c4b2 !important;
+  border-bottom: 1px solid #d1c4b2 !important;
 }
 
 [data-theme="dark"] .card,
@@ -2517,17 +2507,41 @@ html.rail-open .rail__chev,
 [data-theme="dark"] #top-contacts,
 [data-theme="dark"] .bento-insights-grid .card,
 [data-theme="dark"] .campus-chat-box {
-  border: 1.5px solid rgba(255, 255, 255, 0.22) !important;
-  border-top: 1.5px solid rgba(255, 255, 255, 0.22) !important;
-  border-bottom: 1.5px solid rgba(255, 255, 255, 0.22) !important;
-  border-left: 1.5px solid rgba(255, 255, 255, 0.22) !important;
-  border-right: 1.5px solid rgba(255, 255, 255, 0.22) !important;
-  box-shadow: 0 8px 30px -8px rgba(0, 0, 0, 0.6) !important;
+  background: #131c2e !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
   box-sizing: border-box !important;
 }
 
 [data-theme="dark"] .campus-stat-card {
-  border-bottom: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+/* 4. Response Team Progress Meter & Ratios (Fully Functional in Light & Dark Mode) */
+.person__bar {
+  background: rgba(0, 0, 0, 0.08) !important;
+  border-radius: 99px !important;
+  height: 6px !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+[data-theme="dark"] .person__bar {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+.person__bar i {
+  border-radius: inherit !important;
+  background: var(--c-tangerine) !important;
+  height: 100% !important;
+  display: block !important;
+  transform-origin: 0 !important;
+  transition: width 0.4s ease, transform 0.4s ease !important;
+}
+[data-theme="dark"] .person__bar i {
+  background: #38bdf8 !important;
 }
 
 /* 5. Tooltips: High Contrast Dark Background with Crisp White Text */
@@ -2652,7 +2666,7 @@ html.rail-open .rail__chev,
   height: 44px !important;
   border-radius: 12px !important;
   background: var(--surface) !important;
-  border: 1.5px solid #c5b6a3 !important;
+  border: 1.5px solid #d1c4b2 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;

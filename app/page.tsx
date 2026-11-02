@@ -249,15 +249,9 @@ export default function OverviewPage() {
         <div className="hero-logo-showcase" title="CampusDesk Official Logo">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/logo-transparent.png"
+            src={theme === "dark" ? "/logo-dark.png" : "/logo-transparent.png"}
             alt="CampusDesk Official Logo"
-            className="hero-logo-img logo-light-only"
-          />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/logo-dark.png"
-            alt="CampusDesk Official Logo"
-            className="hero-logo-img logo-dark-only"
+            className="hero-logo-img"
           />
         </div>
       </div>
@@ -651,13 +645,15 @@ export default function OverviewPage() {
           <ol className="people" id="people">
             {teamsData.map((t, idx) => {
               const pct = totalFilteredReports > 0 ? Math.round((t.count / totalFilteredReports) * 100) : 0;
-              const barWidth = maxTeamCount > 0 && totalFilteredReports > 0 ? `${Math.round((t.count / maxTeamCount) * 100)}%` : "0%";
+              const barWidth = `${pct}%`;
               return (
                 <li key={t.code} className="person">
                   <span className={`person__av av--t${idx % 3}`} aria-hidden="true">{t.code}</span>
                   <div className="person__who">
                     <span className="person__name">{t.name}<span className="person__mail">{t.mail}</span></span>
-                    <span className="person__bar" aria-hidden="true"><i style={{ width: barWidth }}></i></span>
+                    <span className="person__bar" aria-hidden="true">
+                      <i style={{ width: barWidth, transform: "none" }}></i>
+                    </span>
                   </div>
                   <span className="person__num">{t.count}<small>{pct}%</small></span>
                 </li>
