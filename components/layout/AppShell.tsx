@@ -253,8 +253,6 @@ export function AppShell({ children }: AppShellProps) {
   const activeItem = NAV_ITEMS[activeIndex >= 0 ? activeIndex : 0];
   const routeMeta = ROUTE_INFO[activeItem.pageId] || ROUTE_INFO.overview;
 
-  const logoFile = "/logo-dark.png";
-
   return (
     <>
       {/* 1. Cinematic Startup Logo Splash */}
@@ -284,9 +282,16 @@ export function AppShell({ children }: AppShellProps) {
               <span className="rail__mark">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  className="campus-logo-img"
-                  src={logoFile}
-                  alt="Logo"
+                  className="campus-logo-img logo-light-only"
+                  src="/logo-transparent.png"
+                  alt="CampusDesk Logo"
+                  style={{ width: 26, height: 26, objectFit: "contain" }}
+                />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  className="campus-logo-img logo-dark-only"
+                  src="/logo-dark.png"
+                  alt="CampusDesk Logo"
                   style={{ width: 26, height: 26, objectFit: "contain" }}
                 />
               </span>
@@ -481,11 +486,19 @@ export function AppShell({ children }: AppShellProps) {
 
             {/* Website Logo Avatar */}
             <button className="avatar" type="button" title="CampusDesk Operations Desk" aria-label="CampusDesk Logo & Account">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                className="topbar-logo-img"
-                src={theme === "dark" ? "/logo-dark.png" : "/logo-transparent.png"}
+                className="topbar-logo-img logo-light-only"
+                src="/logo-transparent.png"
                 alt="CampusDesk Logo"
-                style={{ width: "30px", height: "30px", objectFit: "contain", display: "block" }}
+                style={{ width: "30px", height: "30px", objectFit: "contain" }}
+              />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                className="topbar-logo-img logo-dark-only"
+                src="/logo-dark.png"
+                alt="CampusDesk Logo"
+                style={{ width: "30px", height: "30px", objectFit: "contain" }}
               />
             </button>
           </div>

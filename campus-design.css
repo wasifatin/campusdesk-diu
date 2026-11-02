@@ -1640,3 +1640,276 @@ html.rail-open .rail__chev,
   fill: #38bdf8 !important;
   font-weight: 800 !important;
 }
+
+
+/* =============================================================
+   18. THEME MASTER POLISH: DUAL LOGO, BORDERS, TOOLTIPS, AVATARS
+   ============================================================= */
+
+/* 1. Dynamic Dual Logo Switching (Zero Latency CSS) */
+.logo-dark-only {
+  display: none !important;
+}
+.logo-light-only {
+  display: block !important;
+}
+[data-theme="dark"] .logo-dark-only {
+  display: block !important;
+}
+[data-theme="dark"] .logo-light-only {
+  display: none !important;
+}
+
+/* 2. Hero Logo Showcase Card */
+.hero-logo-showcase {
+  background: #ffffff !important;
+  border: 1.5px solid #d1c4b2 !important;
+  border-radius: 18px !important;
+  padding: 16px 22px !important;
+  box-shadow: 0 4px 16px rgba(28, 25, 23, 0.06) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+.hero-logo-img {
+  width: 140px !important;
+  height: 60px !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+[data-theme="dark"] .hero-logo-showcase {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* 3. Hero Banner & Text High Contrast */
+.campus-hero-banner {
+  background: linear-gradient(135deg, #ffffff 0%, #faf6f0 100%) !important;
+  border: 1.5px solid #c5b6a3 !important;
+  border-bottom: 1.5px solid #c5b6a3 !important;
+  border-radius: 22px !important;
+  box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.08) !important;
+  color: #1c1917 !important;
+}
+.hero-title {
+  color: #1c1917 !important;
+}
+.hero-desc {
+  color: #44403c !important;
+}
+[data-theme="dark"] .campus-hero-banner {
+  background: linear-gradient(135deg, #111827 0%, #0f172a 100%) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5) !important;
+  color: #f8fafc !important;
+}
+[data-theme="dark"] .hero-title {
+  color: #f8fafc !important;
+}
+[data-theme="dark"] .hero-desc {
+  color: #cbd5e1 !important;
+}
+
+/* 4. Complete 4-Sided High Visibility Borders on ALL Cards & Functions */
+.card,
+.campus-stat-card,
+.campus-card,
+.campus-lookup-card,
+.campus-feed-card,
+.card--month,
+#mix,
+#top-contacts,
+.bento-insights-grid .card,
+.campus-chat-box {
+  border: 1.5px solid #c5b6a3 !important;
+  border-top: 1.5px solid #c5b6a3 !important;
+  border-bottom: 1.5px solid #c5b6a3 !important;
+  border-left: 1.5px solid #c5b6a3 !important;
+  border-right: 1.5px solid #c5b6a3 !important;
+  box-shadow: 0 2px 10px -2px rgba(28, 25, 23, 0.08), 0 1px 3px rgba(28, 25, 23, 0.04) !important;
+  box-sizing: border-box !important;
+}
+
+.campus-stats-grid {
+  padding-bottom: 4px !important;
+  margin-bottom: 24px !important;
+  overflow: visible !important;
+}
+
+.campus-stat-card {
+  overflow: visible !important;
+  border: 1.5px solid #c5b6a3 !important;
+  border-bottom: 1.5px solid #c5b6a3 !important;
+}
+
+[data-theme="dark"] .card,
+[data-theme="dark"] .campus-stat-card,
+[data-theme="dark"] .campus-card,
+[data-theme="dark"] .campus-lookup-card,
+[data-theme="dark"] .campus-feed-card,
+[data-theme="dark"] .card--month,
+[data-theme="dark"] #mix,
+[data-theme="dark"] #top-contacts,
+[data-theme="dark"] .bento-insights-grid .card,
+[data-theme="dark"] .campus-chat-box {
+  border: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+  border-left: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+  border-right: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow: 0 8px 30px -8px rgba(0, 0, 0, 0.6) !important;
+  box-sizing: border-box !important;
+}
+
+[data-theme="dark"] .campus-stat-card {
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+}
+
+/* 5. Tooltips: High Contrast Dark Background with Crisp White Text */
+.cols__tip,
+#colsTooltip {
+  z-index: 100 !important;
+  background: #1e1b24 !important;
+  min-width: 140px !important;
+  color: #ffffff !important;
+  font-size: var(--fs-xs) !important;
+  font-variant-numeric: tabular-nums !important;
+  pointer-events: none !important;
+  border-radius: 12px !important;
+  padding: 10px 14px !important;
+  line-height: 1.5 !important;
+  position: absolute !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+}
+.cols__tip strong,
+#colsTooltip strong {
+  font-size: var(--fs-sm) !important;
+  margin-bottom: 4px !important;
+  display: block !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+.cols__tip .row,
+#colsTooltip .row {
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 10px !important;
+  display: flex !important;
+  color: #f1f5f9 !important;
+  font-weight: 600 !important;
+}
+.cols__tip .row span,
+#colsTooltip .row span {
+  color: #f1f5f9 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+[data-theme="dark"] .cols__tip,
+[data-theme="dark"] #colsTooltip {
+  background: #161b22 !important;
+  color: #ffffff !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.28) !important;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.8) !important;
+}
+[data-theme="dark"] .cols__tip strong,
+[data-theme="dark"] #colsTooltip strong {
+  color: #ffffff !important;
+}
+[data-theme="dark"] .cols__tip .row,
+[data-theme="dark"] #colsTooltip .row,
+[data-theme="dark"] .cols__tip .row span,
+[data-theme="dark"] #colsTooltip .row span {
+  color: #e2e8f0 !important;
+}
+
+/* 6. Response Team Avatars ("Academic Media Services" AV badge) */
+.person__av.av--t0, .av--t0 {
+  background: #fee2e2 !important;
+  color: #991b1b !important;
+  border: 1.5px solid rgba(185, 28, 28, 0.3) !important;
+}
+.person__av.av--t1, .av--t1 {
+  background: #ede9fe !important;
+  color: #5b21b6 !important;
+  border: 1.5px solid rgba(109, 40, 217, 0.3) !important;
+}
+.person__av.av--t2, .av--t2 {
+  background: #ccfbf1 !important;
+  color: #0f766e !important;
+  border: 1.5px solid rgba(15, 118, 110, 0.35) !important;
+}
+[data-theme="dark"] .person__av.av--t0, [data-theme="dark"] .av--t0 {
+  background: rgba(239, 68, 68, 0.25) !important;
+  color: #fca5a5 !important;
+  border: 1.5px solid rgba(239, 68, 68, 0.45) !important;
+}
+[data-theme="dark"] .person__av.av--t1, [data-theme="dark"] .av--t1 {
+  background: rgba(168, 85, 247, 0.25) !important;
+  color: #d8b4fe !important;
+  border: 1.5px solid rgba(168, 85, 247, 0.45) !important;
+}
+[data-theme="dark"] .person__av.av--t2, [data-theme="dark"] .av--t2 {
+  background: rgba(20, 184, 166, 0.28) !important;
+  color: #5eead4 !important;
+  border: 1.5px solid rgba(20, 184, 166, 0.55) !important;
+}
+
+/* 7. Collapsed Sidebar Navigation in Dark Mode (High Contrast, Never Invisible) */
+[data-theme="dark"] .rail__item {
+  color: rgba(255, 255, 255, 0.72) !important;
+}
+[data-theme="dark"] .rail__item .rail__icon {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #cbd5e1 !important;
+}
+[data-theme="dark"] .rail__item:hover .rail__icon {
+  background: rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
+}
+[data-theme="dark"] .rail__item.is-active .rail__icon {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+[data-theme="dark"] .rail__toggle .rail__icon {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #cbd5e1 !important;
+}
+[data-theme="dark"] .rail__toggle:hover .rail__icon {
+  background: rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
+}
+
+/* 8. Topbar Avatar */
+.avatar {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 12px !important;
+  background: var(--surface) !important;
+  border: 1.5px solid #c5b6a3 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 4px !important;
+  cursor: pointer !important;
+  overflow: hidden !important;
+  box-shadow: 0 2px 8px rgba(34, 27, 38, 0.08) !important;
+}
+[data-theme="dark"] .avatar {
+  background: #181d26 !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* 9. Caution Sign Removal */
+.rail__emergency {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+

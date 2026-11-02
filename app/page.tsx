@@ -249,9 +249,15 @@ export default function OverviewPage() {
         <div className="hero-logo-showcase" title="CampusDesk Official Logo">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
+            src="/logo-transparent.png"
+            alt="CampusDesk Official Logo"
+            className="hero-logo-img logo-light-only"
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/logo-dark.png"
             alt="CampusDesk Official Logo"
-            className="hero-logo-img"
+            className="hero-logo-img logo-dark-only"
           />
         </div>
       </div>
@@ -260,7 +266,7 @@ export default function OverviewPage() {
           CAMPUSDESK 4-CARD STATS GRID
           ------------------------------------------------------------- */}
       <div className="campus-stats-grid">
-        <div className="campus-stat-card">
+        <div className="card campus-stat-card">
           <div className="stat-header">
             <span className="stat-label">Total Reports</span>
             <div className="stat-icon-wrapper">
@@ -275,7 +281,7 @@ export default function OverviewPage() {
           </div>
         </div>
 
-        <div className="campus-stat-card">
+        <div className="card campus-stat-card">
           <div className="stat-header">
             <span className="stat-label">Pending / Triage</span>
             <div className="stat-icon-wrapper" style={{ color: "#f59e0b" }}>
@@ -286,10 +292,10 @@ export default function OverviewPage() {
             </div>
           </div>
           <div className="stat-number">{pending}</div>
-          <div className="stat-trend">Needs department inspection</div>
+          <div className="stat-trend">Needs dispatcher inspection</div>
         </div>
 
-        <div className="campus-stat-card">
+        <div className="card campus-stat-card">
           <div className="stat-header">
             <span className="stat-label">In Progress</span>
             <div className="stat-icon-wrapper" style={{ color: "#a855f7" }}>
@@ -304,7 +310,7 @@ export default function OverviewPage() {
           </div>
         </div>
 
-        <div className="campus-stat-card">
+        <div className="card campus-stat-card">
           <div className="stat-header">
             <span className="stat-label">Resolved</span>
             <div className="stat-icon-wrapper" style={{ color: "#10b981" }}>
