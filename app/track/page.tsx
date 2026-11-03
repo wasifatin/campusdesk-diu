@@ -64,7 +64,7 @@ function TrackTicketInner() {
       </div>
 
       <div className="campus-card" style={{ marginBottom: 24 }}>
-        <form onSubmit={handleLookup} style={{ display: "flex", gap: 10 }}>
+        <form onSubmit={handleLookup} className="lookup-form-wrap">
           <input
             type="text"
             className="form-control"
@@ -132,7 +132,7 @@ function TrackTicketInner() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
+              gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
               gap: 12,
               background: "var(--bg-card-subtle)",
               padding: 14,

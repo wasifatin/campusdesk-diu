@@ -333,7 +333,7 @@ export default function OverviewPage() {
             </p>
           </div>
         </div>
-        <form onSubmit={handleQuickTrack} style={{ display: "flex", gap: "10px" }}>
+        <form onSubmit={handleQuickTrack} className="lookup-form-wrap">
           <input
             type="text"
             className="form-control"
