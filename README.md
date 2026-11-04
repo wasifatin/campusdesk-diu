@@ -1,6 +1,6 @@
 # CampusDesk: AI-Driven Campus Assistant & Triage System
 
-<div align="center">
+<div align="center">  
 
 ![CampusDesk Logo](logo-dark.png)
 
